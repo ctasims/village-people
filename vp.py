@@ -129,16 +129,19 @@ class Villager:
         self.village = village
         # nourishment: [well, adequate, poor, danger] == [4,3,2,1]
         self.nourishment = 3
-        # get monthly good req
-        self.update_food_req()
+        self.age = -1
 
-    def grow_up(self):
-        """ Advances villager to adulthood.
-        Used when populating village for first time with villagers.
+        # update stats
+        self.have_birthday()
+
+    def have_birthday(self):
+        """ every year, advance villager's age and refresh stats
         """
-        self.age = 16
-        self.hp = 1000
-        return self
+        self.age += 1
+        self.update_food_req()
+        self.update_age_label()
+        if self.age == 16:
+            self.grow_up()
 
     def update_food_req(self):
         """ Calculates, stores and returns monthly food requirements for this villager.
@@ -163,6 +166,15 @@ class Villager:
             else:
                 pass
         raise Exception("ERROR: no age group found!")
+
+    def force_grow_up(self):
+        """ Advances villager to adulthood.
+        Used when populating village for first time with villagers.
+        """
+        self.age = 16
+        self.hp = 1000
+        self.advance_age()
+        return self
 
 
 
