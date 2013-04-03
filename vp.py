@@ -1,10 +1,35 @@
 
 
+
+class House:
+    num_houses = 0
+
+    def __init__(self):
+        self.__class__.num_houses += 1
+        self.id = self.__class__.num_houses
+
+    def __str__(self):
+        "House " + self.id
+
 class Village:
     num_villagers = 0
 
     def __init__(self):
-        pass
+        # start off with supplies; 600 is produced by 1 CM in year
+        self.supplies = 600  # enough for 5 people/yr
+        self.food = 2000  # enough to feed 2 people for a year
+
+        # profs
+        self.farmer_ct = 0
+        self.farmers = []
+        self.crafter_ct = 0
+        self.crafters = []
+        self.guard_ct = 0
+        self.guards = []
+
+        # houses
+        self.house_ct = 0
+        self.houses = []
 
 
 class Family:
@@ -90,15 +115,16 @@ class Villager:
     base_age = 0
     age_labels = ['infant', 'child', 'prime', 'middle', 'boring', 'wizened']
     age_groups = [[0, 5], [6, 15], [16, 40], [41, 60], [61, 200]]
-    num_villagers = 0
+    num_people = 0
 
-    def __init__(self):
+    def __init__(self, village):
         """ Called on birth.
         """
-        self.__class__.num_villagers += 1
-        self.id = self.__class__.num_villagers
+        self.__class__.num_people += 1
+        self.id = self.__class__.num_people
         self.age = self.__class__.base_age
         self.hp = self.__class__.base_hp
+        self.village = village
         # nourishment: [well, adequate, poor, danger] == [4,3,2,1]
         self.nourishment = 3
 
