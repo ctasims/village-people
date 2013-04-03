@@ -9,7 +9,7 @@ class House:
         self.id = self.__class__.num_houses
 
     def __str__(self):
-        "House " + self.id
+        return "House %s" % self.id
 
 class Village:
     num_villagers = 0
@@ -158,7 +158,8 @@ class Villager:
 
 
 if __name__ == "__main__":
-    v1 = Villager()
-    f1 = Family(v1)
+    #v1 = Villager()
+    #f1 = Family(v1)
+    h1 = House()
     import pdb; pdb.set_trace()
 
