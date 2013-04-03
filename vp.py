@@ -81,16 +81,24 @@ class Family:
 
 
 class Villager:
-    """ class representing single villager in Jamestown.
+    """ a single villager in Jamestown.
+    Villagers are born, age, marry, have children and die.
+    Their main stat is hp.
     """
     required_food = 2000 * 30
+    base_hp = 150
+    base_age = 0
+    age_labels = ['infant', 'child', 'prime', 'middle', 'boring', 'wizened']
+    age_groups = [[0, 5], [6, 15], [16, 40], [41, 60], [61, 200]]
+    num_villagers = 0
 
     def __init__(self):
         """ Called on birth.
         """
-        Vill.num_villagers += 1
-        self.id = num_villagers
-        self.age = 0
+        self.__class__.num_villagers += 1
+        self.id = self.__class__.num_villagers
+        self.age = self.__class__.base_age
+        self.hp = self.__class__.base_hp
         # nourishment: [well, adequate, poor, danger] == [4,3,2,1]
         self.nourishment = 3
 
@@ -98,6 +106,9 @@ class Villager:
         """ Advances villager to adulthood.
         Used when populating village for first time with villagers.
         """
+        self.age = 16
+        self.hp = 1000
+        return self
 
     #def calc_nourishment(self):
         #""" returns nourishment level of villager.
@@ -105,9 +116,23 @@ class Villager:
         #"""
 
 
-    def get_age_title(self):
-        """ determine age bracket of this villager
+    def get_age_label(self):
+        """ determine age label of this villager, store and return it
         """
+        self.age_group = 0
+        for group in self.__class__.age_groups:
+            if self.age_group >= group[0] and self.age_group <= group[1]:
+            	self.age_group = self.__class__.age_groups.index(group)
+                # return matching age label
+                self.age_label = self.__class__.age_labels[self.age_group]
+                return self.age_label
+            else:
+                pass
+        raise Exception("ERROR: no age group found!")
 
-Vill = Village()
+
+if __name__ == "__main__":
+    v1 = Villager()
+    f1 = Family(v1)
+    import pdb; pdb.set_trace()
 
