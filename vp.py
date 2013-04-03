@@ -111,9 +111,9 @@ class Villager:
     """
     #required_food = 2000 * 30
     base_hp = 150
-    base_age = 0
-    age_labels = ['infant', 'child', 'prime', 'middle', 'boring', 'wizened']
+    age_labels = ['infant', 'child', 'prime', 'middle', 'old']
     age_groups = [[0, 5], [6, 15], [16, 40], [41, 60], [61, 200]]
+    age_hp = [1.5, 8.5, 10, -10, -40]
     num_people = 0
     adult_monthly_food = 30
 
@@ -122,7 +122,6 @@ class Villager:
         """
         self.__class__.num_people += 1
         self.id = self.__class__.num_people
-        self.age = self.__class__.base_age
         self.age_group = 0
         self.age_label = self.__class__.age_labels[self.age_group]
         self.hp = self.__class__.base_hp
@@ -138,10 +137,15 @@ class Villager:
         """ every year, advance villager's age and refresh stats
         """
         self.age += 1
-        self.update_food_req()
-        self.update_age_label()
         if self.age == 16:
             self.grow_up()
+        self.update_food_req()
+        self.update_age_label()
+        self.monthly_update()
+
+    def monthly_update(self):
+        self.hp + self.__class__.self.age_hp[self.age_group]
+
 
     def update_food_req(self):
         """ Calculates, stores and returns monthly food requirements for this villager.
