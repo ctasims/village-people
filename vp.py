@@ -15,7 +15,6 @@ class Village:
     num_villagers = 0
 
     def __init__(self):
-        # start off with supplies; 600 is produced by 1 CM in year
         self.supplies = 600  # enough for 5 people/yr
         self.food = 2000  # enough to feed 2 people for a year
 
