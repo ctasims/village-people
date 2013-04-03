@@ -44,7 +44,7 @@ class Family:
         self.productivity = 1
         self.family_hp = dad.hp
         self.family_size = 1
-        self.sheltered = False
+        self.house = None
 
     def get_members(self):
         return {
@@ -53,21 +53,21 @@ class Family:
                 'kids': self.kids
                 }
 
-    def update_family_size(self):
+    def get_family_size(self):
         """ returns number of villagers in family
         """
         self.family_size = len(self.get_members)
         self.required_food = Villager.required_food * self.family_size
         return self.family_size
 
-    def update_family_hp(self):
+    def get_family_hp(self):
         hp = self.dad.hp + self.mom.hp
         for kid in self.kids:
         	hp += kid.hp
         self.family_hp = hp
         return hp
 
-    def calc_required_food(self):
+    def compute_required_food(self):
         """ calculate calorie reqs of family for month to be well-fed
         """
 
@@ -96,7 +96,7 @@ class Family:
         	self.food = total_village_food
         return self.food
 
-    def calc_productivity(self):
+    def compute_productivity(self):
         """ family's profession output is based solely on family health
         """
         max_productivity = 1000 * self.family_size
@@ -109,12 +109,13 @@ class Villager:
     Villagers are born, age, marry, have children and die.
     Their main stat is hp.
     """
-    required_food = 2000 * 30
+    #required_food = 2000 * 30
     base_hp = 150
     base_age = 0
     age_labels = ['infant', 'child', 'prime', 'middle', 'boring', 'wizened']
     age_groups = [[0, 5], [6, 15], [16, 40], [41, 60], [61, 200]]
     num_people = 0
+    adult_monthly_food = 30
 
     def __init__(self, village):
         """ Called on birth.
@@ -122,10 +123,14 @@ class Villager:
         self.__class__.num_people += 1
         self.id = self.__class__.num_people
         self.age = self.__class__.base_age
+        self.age_group = 0
+        self.age_label = self.__class__.age_labels[self.age_group]
         self.hp = self.__class__.base_hp
         self.village = village
         # nourishment: [well, adequate, poor, danger] == [4,3,2,1]
         self.nourishment = 3
+        # get monthly good req
+        self.update_food_req()
 
     def grow_up(self):
         """ Advances villager to adulthood.
@@ -135,13 +140,17 @@ class Villager:
         self.hp = 1000
         return self
 
-    #def calc_nourishment(self):
-        #""" returns nourishment level of villager.
-        #Based on family's monthly amount of food.
-        #"""
+    def update_food_req(self):
+        """ Calculates, stores and returns monthly food requirements for this villager.
+        Infants and children require 1/3 and 1/2 of everyone else.
+        """
+        if self.age_group <= 1:
+            self.monthly_food_req = self.__class__.adult_monthly_food / (self.age_group + 1)
+        else:
+            self.monthly_food_req = self.__class__.adult_monthly_food
+        return self.monthly_food_req
 
-
-    def get_age_label(self):
+    def update_age_label(self):
         """ determine age label of this villager, store and return it
         """
         self.age_group = 0
@@ -154,6 +163,7 @@ class Villager:
             else:
                 pass
         raise Exception("ERROR: no age group found!")
+
 
 
 if __name__ == "__main__":
