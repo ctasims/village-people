@@ -4,66 +4,70 @@ class Villager:
     Their main stat is hp.
     """
     #required_food = 2000 * 30
-    base_hp = 150
+    birth_hp = 150
     age_labels = ['infant', 'child', 'prime', 'middle', 'old']
     age_groups = [[0, 5], [6, 15], [16, 40], [41, 60], [61, 200]]
     age_hp = [1.5, 8.5, 10, -10, -40]
     num_people = 0
-    adult_monthly_food = 30
+    adult_food_req = 30
+    adult_supply_req = 40
+    genders = ('m', 'f')
+    next_gender = 0
 
     def __init__(self, village):
         """ Called on birth.
+        assign id, get age/label, hp, and stats
         """
+        self.village = village
         self.__class__.num_people += 1
         self.id = self.__class__.num_people
         self.age_group = 0
         self.age_label = self.__class__.age_labels[self.age_group]
-        self.hp = self.__class__.base_hp
-        self.village = village
-        # nourishment: [well, adequate, poor, danger] == [4,3,2,1]
-        self.nourishment = 3
-        self.age = -1
 
-        # update stats
-        self.have_birthday()
+        # assign gender and toggle so alternate between m/f
+        self.gender = self.__class__.genders[self.__class__.next_gender]
+        self.__class__.next_gender = 1 - self.__class__.next_gender
+
+        # villager stats
+        self.hp = self.__class__.birth_hp
+        self.food_req = self.__class__.adult_food_req / 2
+        self.supplies_req = self.__class__.adult_supply_req
+        self.nourishment = 3
+        self.age = 0
 
     def have_birthday(self):
         """ every year, advance villager's age and refresh stats
         """
         self.age += 1
+        # update age group and label
+        for group in self.__class__.age_groups:
+            if self.age_group <= group[1]:
+            	self.age_group = self.__class__.age_groups.index(group)
+                self.age_label = self.__class__.age_labels[self.age_group]
+            else:
+                pass
         if self.age == 16:
             self.grow_up()
-        self.update_food_req()
         self.update_age_label()
         self.monthly_update()
+
+    def grow_up(self):
+        """ upon reaching adulthood women become available for marriage and 
+        men start their own family (with only them in it)
+        """
+        self.food_req = self.__class__.adult_food_req
+        # guys start family; girls become available for marriage
+        if self.gender = 'm':
+        	self.family = Family(self)
+        elif self.gender = 'f':
+        	self.village.prospects += self
+        else:
+        	raise Exception("Growing pains!")
+
 
     def monthly_update(self):
         self.hp + self.__class__.self.age_hp[self.age_group]
 
-
-    def update_food_req(self):
-        """ Calculates, stores and returns monthly food requirements for this villager.
-        Infants and children require 1/3 and 1/2 of everyone else.
-        """
-        if self.age_group <= 1:
-            self.monthly_food_req = self.__class__.adult_monthly_food / (self.age_group + 1)
-        else:
-            self.monthly_food_req = self.__class__.adult_monthly_food
-        return self.monthly_food_req
-
-    def update_age_label(self):
-        """ determine age label of this villager, store and return it
-        """
-        self.age_group = 0
-        for group in self.__class__.age_groups:
-            if self.age_group >= group[0] and self.age_group <= group[1]:
-            	self.age_group = self.__class__.age_groups.index(group)
-                # return matching age label
-                self.age_label = self.__class__.age_labels[self.age_group]
-                return self.age_label
-            else:
-                pass
-        raise Exception("ERROR: no age group found!")
 
     def force_grow_up(self):
         """ Advances villager to adulthood.
