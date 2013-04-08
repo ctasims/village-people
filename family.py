@@ -12,14 +12,10 @@ class Family:
         self.output = 1
         self.house = None
         # set stats
-        self.compute_stats()
+        self.update_stats()
 
     def get_members(self):
-        return {
-                'dad': self.dad,
-                'mom': self.mom,
-                'kids': self.kids
-                }
+        return [self.dad, self.mom] + self.kids
 
     def update_stats(self):
         self.compute_size()
