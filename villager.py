@@ -14,13 +14,13 @@ class Villager:
     req_food = 30
     req_supplies = 40
 
-    def __init__(self, village):
+    def __init__(self, village, family):
         """ Called on birth.
         assign id, get age/label, hp, and stats
         """
         self.village = village
         self.village.villagers.append(self)
-        self.family = None
+        self.family = family
         self.__class__.num_villagers += 1
         self.id = self.__class__.num_villagers
         self.age_group = 0
@@ -62,6 +62,9 @@ class Villager:
         	spouse = self.village.prospects.pop()
         	self.family = Family(self, spouse)
         	spouse.family = self.family
+        	# set arbitrary gender to determine who has the babies
+        	self.gender = 1
+        	spouse.gender = 0
         else:
         	self.village.prospects.append(self)
 
@@ -72,3 +75,13 @@ class Villager:
         while self.age is not 16:
         	self.have_birthday()
         return self
+
+    def give_birth(self):
+        """ create new villager and add them to family
+        """
+        if self.gender is 0:
+            baby = Villager(self.village, self.family)
+            return baby
+        else:
+        	pass
+

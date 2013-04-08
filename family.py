@@ -3,7 +3,8 @@ class Family:
     """ Family containing villagers in Jamestown
     """
 
-    def __init__(self, dad, mom):
+    def __init__(self, dad=None, mom=None):
+        self.size = 0
         self.dad = dad
         self.mom = mom
         self.kids = []
@@ -15,7 +16,10 @@ class Family:
         self.update_stats()
 
     def get_members(self):
-        return [self.dad, self.mom] + self.kids
+        if self.size is 0:
+        	return []
+        else:
+        	return [self.dad, self.mom] + self.kids
 
     def update_stats(self):
         self.compute_size()
@@ -53,13 +57,16 @@ class Family:
         self.update_stats()
         return self
 
-    def birth(self):
-        """ create new villager and add them to family
+    def have_baby(self):
+        """ have a new baby in family. Parent with gender 0 then has baby.
         """
-        new_kid = Villager(self.dad.village)
-        self.kids.append(new_kid)
+        for parent in [self.mom, self.dad]:
+            if parent.gender is 0:
+                baby = parent.give_birth()
+            else: continue
+        self.kids.append(baby)
         self.update_stats()
-        return new_kid
+        return baby
         
     def get_groceries(self, total_village_food):
         """ take family's desired monthly portion of food from village total.
@@ -76,6 +83,9 @@ class Family:
         """ family's profession output is based solely on family health.
         curr hp / max hp
         """
-        max_output = 1000 * self.size
-        self.output = self.hp / max_output
+        if self.size is 0:
+        	self.output = 0
+        else:
+            max_output = 1000 * self.size
+            self.output = self.hp / max_output
         return self.output
