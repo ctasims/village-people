@@ -38,16 +38,15 @@ class Family:
     def compute_reqs(self):
         """ Calculates required food and supplies for entire family
         """
-        self.req_food = Villager.req_food * self.size
-        self.req_supplies = 40 * self.size
+        members = self.get_members()
+        self.req_food = sum([vill.req_food for vill in members])
+        self.req_supplies = sum([vill.req_supplies for vill in members])
         return {'food': self.req_food, 'supplies': self.req_supplies}
 
     def compute_hp(self):
         """ Calculates total health of family
         """
-        self.hp = self.dad.hp + self.mom.hp
-        for kid in self.kids:
-        	self.hp += kid.hp
+        self.hp = sum([vill.hp for vill in self.get_members()])
         return self.hp
 
     def add_mom(self, villager):
