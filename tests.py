@@ -61,6 +61,7 @@ class TestFamily(unittest.TestCase):
         self.vill = Village()
         self.bob = Villager(self.vill)
         self.mary = Villager(self.vill)
+        self.family = None
 
     def test_init(self):
         self.assertEqual(len(self.vill.villagers), 2)
@@ -68,9 +69,18 @@ class TestFamily(unittest.TestCase):
     def test_start_family(self):
         self.bob.force_grow_up()
         self.mary.force_grow_up()  # bob available so they'll get married
+        self.family = self.mary.family
         self.assertTrue(self.bob.family)
         self.assertTrue(self.mary.family)
         self.assertEqual(self.mary.family, self.bob.family)
+
+    def test_baby(self):
+        self.baby = self.family.birth()
+        self.assertEqual(len(self.vill.villagers), 3)
+        self.assertEqual(self.mary.family, self.baby.family)
+        self.assertEqual(self.bob.family, self.baby.family)
+
+
 
 
 if __name__ == '__main__':

@@ -56,10 +56,10 @@ class Family:
     def birth(self):
         """ create new villager and add them to family
         """
-        new_kid = Villager()
+        new_kid = Villager(self.dad.village)
         self.kids.append(new_kid)
         self.update_stats()
-        return self
+        return new_kid
         
     def get_groceries(self, total_village_food):
         """ take family's desired monthly portion of food from village total.
