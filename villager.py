@@ -11,8 +11,6 @@ class Villager:
     num_people = 0
     adult_food_req = 30
     adult_supply_req = 40
-    genders = ('m', 'f')
-    next_gender = 0
 
     def __init__(self, village):
         """ Called on birth.
@@ -23,10 +21,6 @@ class Villager:
         self.id = self.__class__.num_people
         self.age_group = 0
         self.age_label = self.__class__.age_labels[self.age_group]
-
-        # assign gender and toggle so alternate between m/f
-        self.gender = self.__class__.genders[self.__class__.next_gender]
-        self.__class__.next_gender = 1 - self.__class__.next_gender
 
         # villager stats
         self.hp = self.__class__.birth_hp
@@ -41,7 +35,7 @@ class Villager:
         self.age += 1
         # update age group and label
         for group in self.__class__.age_groups:
-            if self.age_group <= group[1]:
+            if self.age_group <= group[1]:  # child or infant
             	self.age_group = self.__class__.age_groups.index(group)
                 self.age_label = self.__class__.age_labels[self.age_group]
             else:
@@ -52,17 +46,16 @@ class Villager:
         self.monthly_update()
 
     def grow_up(self):
-        """ upon reaching adulthood women become available for marriage and 
-        men start their own family (with only them in it)
+        """ upon reaching adulthood villagers look for mate to start family with.
+        If no mates, they wait.
         """
         self.food_req = self.__class__.adult_food_req
-        # guys start family; girls become available for marriage
-        if self.gender = 'm':
-        	self.family = Family(self)
-        elif self.gender = 'f':
-        	self.village.prospects += self
+        # check for mate; if none, add self to Prospects list
+        if self.village.prospects:
+        	spouse = self.village.prospects.pop()
+        	self.family = Family(self, spouse)
         else:
-        	raise Exception("Growing pains!")
+        	self.village.prospects.append(self)
 
 
     def monthly_update(self):
