@@ -8,7 +8,7 @@ class Villager:
     age_labels = ['infant', 'child', 'prime', 'middle', 'old']
     age_groups = [[0, 5], [6, 15], [16, 40], [41, 60], [61, 200]]
     age_hp = [1.5, 8.5, 10, -10, -40]
-    num_people = 0
+    num_villagers = 0
     adult_food_req = 30
     adult_supply_req = 40
 
@@ -17,8 +17,8 @@ class Villager:
         assign id, get age/label, hp, and stats
         """
         self.village = village
-        self.__class__.num_people += 1
-        self.id = self.__class__.num_people
+        self.__class__.num_villagers += 1
+        self.id = self.__class__.num_villagers
         self.age_group = 0
         self.age_label = self.__class__.age_labels[self.age_group]
 
