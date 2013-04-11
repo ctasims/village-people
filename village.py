@@ -1,3 +1,6 @@
+import random
+
+
 class Village:
     num_villagers = 0
 
@@ -29,7 +32,6 @@ class Village:
         [31, 60] == craftsman
         [61, 99] == guard
         """
-        import random
         random.seed()
         rate = random.random()
         if rate <= self.farmer_rate:
@@ -41,6 +43,9 @@ class Village:
         else:
         	self.guards.append(villager)
         	return 'guard'
+
+    def update_profession(self, villager):
+        """ every year, adult villagers 
             
 
         

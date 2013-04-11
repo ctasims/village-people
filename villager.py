@@ -1,4 +1,5 @@
 from family import Family
+import random
 
 
 class Villager:
@@ -18,6 +19,15 @@ class Villager:
     next_gender = 1
     professions = ['farmer', 'craftsman', 'guard']
 
+    # get list of random names
+    file = open('males.txt', 'r')
+    male_names = file.read().split(',')
+    file.close()
+    file = open('females.txt', 'r')
+    female_names = file.read().split(',')
+    file.close()
+
+
 
     def __init__(self, village, family):
         """ Called on birth.
@@ -31,8 +41,14 @@ class Villager:
         self.id = self.__class__.num_villagers
         self.age_group = 0
         self.age_label = self.__class__.age_labels[self.age_group]
+
+        # get gender and name
         self.gender = self.__class__.genders[self.__class__.next_gender]
         self.__class__.next_gender = 1 - self.__class__.next_gender
+        if self.gender is 0:
+        	self.name = random.choice(self.__class__.female_names)
+        else:
+        	self.name = random.choice(self.__class__.male_names)
 
         # villager stats
         self.age = 0
@@ -79,17 +95,14 @@ class Villager:
         self.profession = self.village.new_profession(self)
         print "%s becomes a %s" % (self, self.profession)
 
-        # women go on prospects list
-        if self.gender == 'f':
-        	self.village.prospects.append(self)
-
-        # men look for mate on prospects list; also start family
-        elif self.gender == 'm':
+        if self.gender == 'm':
             self.family = Family(self)
-            self.check_mate()
-        else:
+        elif self.gender == 'f':
+            pass
+        else: 
         	raise Exception("no gender!")
 
+        self.check_mate()
         return self
 
 
@@ -98,6 +111,7 @@ class Villager:
         Called from grow_up.
         Villagers do not remarry if spouse dies.
         """
+        # women go on prospects list
         if self.gender == 'f':
         	self.village.prospects.append(self)
         elif self.gender == 'm':
@@ -108,6 +122,7 @@ class Villager:
                 print "%s married %s!" % (self, self.spouse)
             else:
                 pass
+                print "%s found no prospects" % self
         return self
 
 
