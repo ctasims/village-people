@@ -59,6 +59,9 @@ class Villager:
         self.req_supples = self.__class__.req_supplies
         self.nourishment = 3
 
+    def __unicode__(self):
+        return self.name
+
 
     def have_birthday(self):
         """ every year, advance villager's age and refresh stats
