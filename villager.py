@@ -49,9 +49,9 @@ class Villager:
         else:
         	self.gender = manual_gender
         if self.gender is 'f':
-        	self.name = 'f_' + random.choice(self.__class__.female_names)
+        	self.name = random.choice(self.__class__.female_names)
         else:
-        	self.name = 'm_' + random.choice(self.__class__.male_names)
+        	self.name = random.choice(self.__class__.male_names)
 
         # villager stats
         self.age = 0
@@ -98,11 +98,11 @@ class Villager:
         """
         self.req_food = self.__class__.req_food
         # get profession
-        self.profession = self.village.new_profession(self)
-        print "\n%s becomes a %s" % (self, self.profession)
 
         if self.gender == 'm':
             self.family = Family(self)
+            self.profession = self.village.new_profession(self)
+            print "\n%s becomes a %s" % (self, self.profession)
         elif self.gender == 'f':
             pass
         else: 

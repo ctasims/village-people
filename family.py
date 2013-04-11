@@ -5,9 +5,9 @@ class Family:
     """
 
     def __init__(self, dad=None):
-        self.size = 0
+        self.size = 1 if dad else 0
         self.dad = dad
-        #self.mom = mom
+        self.mom = None
         self.kids = []
 
         self.food = 0
@@ -25,7 +25,8 @@ class Family:
         if self.size is 0:
         	return []
         else:
-        	return [self.dad, self.mom] + self.kids
+        	members = [self.dad, self.mom] + self.kids
+        	return filter(None, members)  # get rid of None elements
 
 
     def update_stats(self):
