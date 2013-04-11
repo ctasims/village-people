@@ -145,9 +145,10 @@ class Villager:
     def give_birth(self):
         """ create new villager and add them to family
         """
-        if self.gender is 0:
+        if self.gender is 'f':
             baby = Villager(self.village, self.family)
             return baby
         else:
+        	raise Exception("dad can't have a baby!")
         	return None
 

@@ -17,7 +17,7 @@ class Family:
         self.update_stats()
 
 
-    def __unicode__(self):
+    def __repr__(self):
         return "family of %s" % self.dad
 
 

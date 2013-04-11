@@ -20,40 +20,58 @@ class TestVillager(unittest.TestCase):
     def setUp(self):
         self.vill = Village()
         self.fam = Family()
-        self.bob = Villager(self.vill, self.fam)
+        self.dad = Villager(self.vill, self.fam, 'm')
+        self.mom = Villager(self.vill, self.fam, 'f')
 
     def test_init(self):
-        self.assertEqual(self.bob.age, 0)
-        self.assertEqual(self.bob.age_group, 0)
-        self.assertEqual(self.bob.age_label, 'infant')
+        self.assertEqual(self.dad.age, 0)
+        self.assertEqual(self.dad.age_group, 0)
+        self.assertEqual(self.dad.age_label, 'infant')
         self.assertTrue(self.vill.villagers)
 
     def test_birthday(self):
-        self.bob.have_birthday()
-        self.assertEqual(self.bob.age, 1)
-        self.assertEqual(self.bob.age_group, 0)
-        self.assertEqual(self.bob.age_label, 'infant')
+        self.dad.have_birthday()
+        self.assertEqual(self.dad.age, 1)
+        self.assertEqual(self.dad.age_group, 0)
+        self.assertEqual(self.dad.age_label, 'infant')
 
-    def test_force_grow_up(self):
-        self.bob.force_grow_up()
-        self.assertEqual(self.bob.age, 16)
-        self.assertEqual(self.bob.age_group, 2)
-        self.assertEqual(self.bob.age_label, 'prime')
+    def test_force_grow_up_male(self):
+        self.dad.force_grow_up()
+        self.assertEqual(self.dad.age, 16)
+        self.assertEqual(self.dad.age_group, 2)
+        self.assertEqual(self.dad.age_label, 'prime')
+        self.assertFalse(self.vill.prospects)
+
+    def test_force_grow_up_female(self):
+        self.mom.force_grow_up()
+        self.assertEqual(self.mom.age, 16)
+        self.assertEqual(self.mom.age_group, 2)
+        self.assertEqual(self.mom.age_label, 'prime')
         self.assertTrue(self.vill.prospects)
 
-    def test_grow_up(self):
-        self.setUp()  # set bob to baby
-        while self.bob.age is not 16:
-        	self.bob.have_birthday()
-        self.assertEqual(self.bob.age, 16)
-        self.assertEqual(self.bob.req_food, 30)
-        self.assertEqual(self.bob.hp, 1000)
+    def test_grow_up_male(self):
+        self.setUp()  # set dad to baby
+        while self.dad.age is not 16:
+        	self.dad.have_birthday()
+        self.assertEqual(self.dad.age, 16)
+        self.assertEqual(self.dad.req_food, 30)
+        self.assertEqual(self.dad.hp, 1000)
+        self.assertFalse(self.vill.prospects)
+
+    def test_grow_up_female(self):
+        self.setUp()  # set dad to baby
+        while self.mom.age is not 16:
+        	self.mom.have_birthday()
+        self.assertEqual(self.mom.age, 16)
+        self.assertEqual(self.mom.req_food, 30)
+        self.assertEqual(self.mom.hp, 1000)
         self.assertTrue(self.vill.prospects)
 
 
     def tearDown(self):
         self.vill = None
-        self.bob = None
+        self.dad = None
+        self.mom = None
         self.fam = None
 
 
@@ -63,34 +81,33 @@ class TestFamily(unittest.TestCase):
         self.vill = Village()
         self.fam1 = Family()
         self.fam2 = Family()
-        self.bob = Villager(self.vill, self.fam1, 'm')
-        self.mary = Villager(self.vill, self.fam2, 'f')
+        self.dad = Villager(self.vill, self.fam1, 'm')
+        self.mom = Villager(self.vill, self.fam2, 'f')
 
     def test_init(self):
         self.assertEqual(len(self.vill.villagers), 2)
         self.assertNotEqual(self.fam1, self.fam2)
-        self.assertNotEqual(self.bob.family, self.mary.family)
+        self.assertNotEqual(self.dad.family, self.mom.family)
 
     def test_start_family(self):
-        self.mary.force_grow_up()
-        self.bob.force_grow_up()  # mary available
-        import pdb; pdb.set_trace()
-        self.assertTrue(self.bob.family)
-        self.assertTrue(self.mary.family)
-        self.assertEqual(self.mary.family, self.bob.family)
+        self.mom.force_grow_up()
+        self.dad.force_grow_up()  # mom available
+        self.assertTrue(self.dad.family)
+        self.assertTrue(self.mom.family)
+        self.assertEqual(self.mom.family, self.dad.family)
 
     def test_baby(self):
-        self.mary.force_grow_up()
-        self.bob.force_grow_up()
-        self.baby = self.bob.family.have_baby()
+        self.mom.force_grow_up()
+        self.dad.force_grow_up()
+        self.baby = self.dad.family.have_baby()
         self.assertEqual(len(self.vill.villagers), 3)
-        self.assertEqual(self.mary.family, self.baby.family)
-        self.assertEqual(self.bob.family, self.baby.family)
+        self.assertEqual(self.mom.family, self.baby.family)
+        self.assertEqual(self.dad.family, self.baby.family)
 
     def tearDown(self):
         self.vill = None
-        self.bob = None
-        self.mary = None
+        self.dad = None
+        self.mom = None
         self.family = None
 
 
