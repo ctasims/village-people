@@ -1,6 +1,7 @@
 
 class Family:
-    """ Family containing villagers in Jamestown
+    """ A family of villagers.
+    Families are created when a villager grows up and marries another from the prospect list.
     """
 
     def __init__(self, dad=None, mom=None):
@@ -59,14 +60,18 @@ class Family:
 
     def have_baby(self):
         """ have a new baby in family. Parent with gender 0 then has baby.
+        Called by ???
         """
         for parent in [self.mom, self.dad]:
             if parent.gender is 0:
                 baby = parent.give_birth()
             else: continue
-        self.kids.append(baby)
-        self.update_stats()
-        return baby
+        if baby is None:
+            raise Exception("no baby!")
+        else:
+            self.kids.append(baby)
+            self.update_stats()
+            return baby
         
     def get_groceries(self, total_village_food):
         """ take family's desired monthly portion of food from village total.
@@ -89,3 +94,4 @@ class Family:
             max_output = 1000 * self.size
             self.output = self.hp / max_output
         return self.output
+

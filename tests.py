@@ -95,7 +95,6 @@ class TestFamily(unittest.TestCase):
         self.family = None
 
 
-
-
 if __name__ == '__main__':
 	unittest.main()
+
