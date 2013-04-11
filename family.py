@@ -4,7 +4,7 @@ class Family:
     Families are created when a villager grows up and marries another from the prospect list.
     """
 
-    def __init__(self, dad):
+    def __init__(self, dad=None):
         self.size = 0
         self.dad = dad
         #self.mom = mom
@@ -74,7 +74,7 @@ class Family:
         Called by ???
         """
         if self.mom:
-        	baby = self.mom.give_birth()
+            baby = self.mom.give_birth()
             self.kids.append(baby)
             self.update_stats()
             return baby

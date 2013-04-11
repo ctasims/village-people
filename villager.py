@@ -20,16 +20,16 @@ class Villager:
     professions = ['farmer', 'craftsman', 'guard']
 
     # get list of random names
-    file = open('males.txt', 'r')
-    male_names = file.read().split(',')
+    file = open('male_names.txt', 'r')
+    male_names = file.read().splitlines()
     file.close()
-    file = open('females.txt', 'r')
-    female_names = file.read().split(',')
+    file = open('female_names.txt', 'r')
+    female_names = file.read().splitlines()
     file.close()
 
 
 
-    def __init__(self, village, family):
+    def __init__(self, village, family, manual_gender=None):
         """ Called on birth.
         assign id, get age/label, hp, and stats
         """
@@ -43,12 +43,15 @@ class Villager:
         self.age_label = self.__class__.age_labels[self.age_group]
 
         # get gender and name
-        self.gender = self.__class__.genders[self.__class__.next_gender]
-        self.__class__.next_gender = 1 - self.__class__.next_gender
-        if self.gender is 0:
-        	self.name = random.choice(self.__class__.female_names)
+        if manual_gender is None:
+            self.gender = self.__class__.genders[self.__class__.next_gender]
+            self.__class__.next_gender = 1 - self.__class__.next_gender
         else:
-        	self.name = random.choice(self.__class__.male_names)
+        	self.gender = manual_gender
+        if self.gender is 'f':
+        	self.name = 'f_' + random.choice(self.__class__.female_names)
+        else:
+        	self.name = 'm_' + random.choice(self.__class__.male_names)
 
         # villager stats
         self.age = 0
@@ -59,7 +62,7 @@ class Villager:
         self.req_supples = self.__class__.req_supplies
         self.nourishment = 3
 
-    def __unicode__(self):
+    def __repr__(self):
         return self.name
 
 
@@ -82,11 +85,11 @@ class Villager:
         self.hp = 1000 if self.hp > 1000 else self.hp
         # adult only stuff
         if self.age > 16:
-        	self.profession = self.village.update_profession(self)
-        	print "%s is now a %s" % (self, self.profession)
+            self.profession = self.village.update_profession(self)
+            print "\n%s is now a %s" % (self, self.profession)
         	# check for mate if single
             if self.spouse is None:
-            	self.check_mate()
+                self.check_mate()
 
 
     def grow_up(self):
@@ -96,7 +99,7 @@ class Villager:
         self.req_food = self.__class__.req_food
         # get profession
         self.profession = self.village.new_profession(self)
-        print "%s becomes a %s" % (self, self.profession)
+        print "\n%s becomes a %s" % (self, self.profession)
 
         if self.gender == 'm':
             self.family = Family(self)
@@ -120,12 +123,13 @@ class Villager:
         elif self.gender == 'm':
             if self.village.prospects:
                 self.spouse = self.village.prospects.pop()
-                spouse.spouse = self
-                spouse.family = self.family
-                print "%s married %s!" % (self, self.spouse)
+                self.spouse.spouse = self
+                self.spouse.family = self.family
+                self.family.add_mom(self.spouse)
+                print "\n%s married %s!" % (self, self.spouse)
             else:
                 pass
-                print "%s found no prospects" % self
+                print "\n%s found no prospects" % self
         return self
 
 

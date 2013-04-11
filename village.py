@@ -46,6 +46,5 @@ class Village:
 
     def update_profession(self, villager):
         """ every year, adult villagers 
+        """
             
-
-        

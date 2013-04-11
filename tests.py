@@ -63,8 +63,8 @@ class TestFamily(unittest.TestCase):
         self.vill = Village()
         self.fam1 = Family()
         self.fam2 = Family()
-        self.bob = Villager(self.vill, self.fam1)
-        self.mary = Villager(self.vill, self.fam2)
+        self.bob = Villager(self.vill, self.fam1, 'm')
+        self.mary = Villager(self.vill, self.fam2, 'f')
 
     def test_init(self):
         self.assertEqual(len(self.vill.villagers), 2)
@@ -72,9 +72,9 @@ class TestFamily(unittest.TestCase):
         self.assertNotEqual(self.bob.family, self.mary.family)
 
     def test_start_family(self):
-        self.bob.force_grow_up()
-        self.mary.force_grow_up()  # bob available so they'll get married
-        self.family = self.mary.family
+        self.mary.force_grow_up()
+        self.bob.force_grow_up()  # mary available
+        import pdb; pdb.set_trace()
         self.assertTrue(self.bob.family)
         self.assertTrue(self.mary.family)
         self.assertEqual(self.mary.family, self.bob.family)
@@ -82,8 +82,7 @@ class TestFamily(unittest.TestCase):
     def test_baby(self):
         self.mary.force_grow_up()
         self.bob.force_grow_up()
-        self.family = self.bob.family
-        self.baby = self.family.have_baby()
+        self.baby = self.bob.family.have_baby()
         self.assertEqual(len(self.vill.villagers), 3)
         self.assertEqual(self.mary.family, self.baby.family)
         self.assertEqual(self.bob.family, self.baby.family)
