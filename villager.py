@@ -18,6 +18,7 @@ class Villager:
     next_gender = 1
     professions = ['farmer', 'craftsman', 'guard']
 
+
     def __init__(self, village, family):
         """ Called on birth.
         assign id, get age/label, hp, and stats
@@ -42,6 +43,7 @@ class Villager:
         self.req_supples = self.__class__.req_supplies
         self.nourishment = 3
 
+
     def have_birthday(self):
         """ every year, advance villager's age and refresh stats
         """
@@ -59,40 +61,53 @@ class Villager:
         # adjust hp
         self.hp += self.__class__.age_hp[self.age_group]
         self.hp = 1000 if self.hp > 1000 else self.hp
+        # adult only stuff
+        if self.age > 16:
+        	self.profession = self.village.update_profession(self)
+        	print "%s is now a %s" % (self, self.profession)
+        	# check for mate if single
+            if self.spouse is None:
+            	self.check_mate()
 
 
     def grow_up(self):
-        """ upon reaching adulthood villagers look for mate to start family with.
-        If no mates, they become prospect.
+        """ upon reaching adulthood males start family and look for mate.
+        females go onto Prospects list.
         """
         self.req_food = self.__class__.req_food
+        # get profession
+        self.profession = self.village.new_profession(self)
+        print "%s becomes a %s" % (self, self.profession)
 
-        # check for mate; if none, add self to Prospects list
-        if self.village.prospects:
-            self.get_married()
-        else:
+        # women go on prospects list
+        if self.gender == 'f':
         	self.village.prospects.append(self)
 
-        # get new profession or check for update
-        if self.profession is None:
-        	self.profession = self.village.new_profession(self)
-        	print "%s becomes a %s" % (self, self.profession)
+        # men look for mate on prospects list; also start family
+        elif self.gender == 'm':
+            self.family = Family(self)
+            self.check_mate()
         else:
-        	self.profession = self.village.update_profession(self)
-        	print "%s is now a %s" % (self, self.profession)
+        	raise Exception("no gender!")
+
         return self
 
-    def get_married(self):
-        """ grab mate from prospects list and start family.
+
+    def check_mate(self):  # har har har
+        """ grab mate from prospects list, if available
         Called from grow_up.
         Villagers do not remarry if spouse dies.
         """
-        spouse = self.village.prospects.pop()
-        self.family = Family(self, spouse)
-        spouse.family = self.family
-        # set arbitrary gender to determine who has the babies
-        self.gender = 1
-        spouse.gender = 0
+        if self.gender == 'f':
+        	self.village.prospects.append(self)
+        elif self.gender == 'm':
+            if self.village.prospects:
+                self.spouse = self.village.prospects.pop()
+                spouse.spouse = self
+                spouse.family = self.family
+                print "%s married %s!" % (self, self.spouse)
+            else:
+                pass
         return self
 
 
@@ -103,6 +118,7 @@ class Villager:
         while self.age is not 16:
         	self.have_birthday()
         return self
+
 
     def give_birth(self):
         """ create new villager and add them to family
