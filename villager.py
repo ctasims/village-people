@@ -102,9 +102,8 @@ class Villager:
         # get profession
 
         if self.gender == 'm':
-            self.family = Family(self.village, self.family.house, dad=self,)
             self.profession = self.village.new_profession(self)
-            self.family.profession = self.profession
+            self.family = Family(self.village, self.family.house, dad=self)
             print "\n{0} becomes a {1}".format(self, self.profession)
         elif self.gender == 'f':
             pass

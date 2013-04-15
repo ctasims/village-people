@@ -12,13 +12,12 @@ class Family:
     -- health of family members
     """
 
-    def __init__(self, village, house, dad=None):
+    def __init__(self, village, house, dad=None, profession=None):
         # dad is only None on startup, for initial families
         # house is home of dad's parents. On startup it's just an empty house.
         self.size = 1 if dad else 0
         self.village = village
         self.house = house
-        self.dad = dad
         self.output = 100
         self.mom = None
         self.kids = []
@@ -29,7 +28,10 @@ class Family:
         # on startup, dad will be None
         if dad is None:
         	self.living_with_parents = False
+        	self.profession = profession
         else:
+            self.dad = dad
+            self.profession = self.dad.profession
             self.living_with_parents = True
 
         self.get_house()
@@ -43,12 +45,24 @@ class Family:
 
     def monthly_update(self):
         """
-        If family living with dad's parents, checks to build new one.
-        Updates output value.
+        update stats.
+        update output.
+        get output and add to village stores, based on prof.
+        get required food and supplies.
+        get house if family doesn't have its own.
         """
         self.update_stats()
-        self.update_output()
-        # compute required food and supplies
+
+        if self.living_with_parents:
+        	self.get_house()
+
+        output = self.update_output()
+        if self.profession == 'farmer':
+        	self.village.food += output
+        elif self.profession == 'crafter':
+            self.village.supplies += output
+
+        self.print_status()
 
 
     def update_stats(self):
@@ -154,7 +168,7 @@ class Family:
         	print "{0} can't get new house!".format(self)
 
 
-    def get_status(self):
+    def print_status(self):
         print "{0}: hp {1}, output {2}".format(self, self.compute_hp(),
                 self.output)
 
