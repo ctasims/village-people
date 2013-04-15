@@ -17,7 +17,7 @@ class Villager:
     req_supplies = 40
     genders = ['f', 'm']
     next_gender = 1
-    professions = ['farmer', 'craftsman', 'guard']
+    professions = ['farmer', 'crafter', 'guard']
 
     # get list of random names
     # from http://listofrandomnames.com/
@@ -65,6 +65,16 @@ class Villager:
 
     def __repr__(self):
         return self.name
+
+
+    def monthly_update(self):
+        """
+        every month villagers get food and update their hp
+        """
+        if self.family.nourishment is "good":
+        	self.hp += 20
+        else:
+        	self.hp -= 40
 
 
     def have_birthday(self):

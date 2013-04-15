@@ -59,29 +59,38 @@ class Family:
         if self.living_with_parents:
         	self.get_house()
 
-        output = self.update_output()
-        if self.profession == 'farmer':
-        	self.village.food += output
-        elif self.profession == 'crafter':
-            self.village.supplies += output
 
         # get food
         if self.village.food >= self.req_food:
         	self.food = self.req_food
+        	self.nourishment = "good"
         	self.village.food -= self.req_food
         else:  # not enough food to be well-fed
         	self.food = self.village.food
+        	self.nourishment = "poor"
         	self.village.food = 0
         	print "Not enough food!"
 
         # get supplies
         if self.village.supplies >= self.req_supplies:
         	self.supplies = self.req_supplies
+        	self.preparedness = "good"
         	self.village.supplies -= self.req_supplies
-        else:  # not enough supplies to be well-fed
+        else:  # not enough supplies for max output
         	self.supplies = self.village.supplies
+        	self.preparedness = "poor"
         	self.village.supplies = 0
         	print "Not enough supplies!"
+
+        # villager update
+        for member in self.members:
+        	member.monthly_update()
+
+        output = self.update_output()
+        if self.profession == 'farmer':
+        	self.village.food += output
+        elif self.profession == 'crafter':
+            self.village.supplies += output
 
         self.print_status()
 
@@ -159,14 +168,6 @@ class Family:
         	print "family %s can't have kids - no mom!" % self
 
 
-    def get_food(self, total_village_food):
-        """
-        take family's desired monthly portion of food from village total.
-        If not enough, take what's left.
-        Return amount of food taken.
-        """
-
-    
     def get_house(self):
         """
         When family is living with parents of dad, try to get a diff house.
@@ -195,10 +196,17 @@ class Family:
         	print "No family members!"
         	return
 
+        # living at home means lower productivity
         if self.living_with_parents:
         	self.output -= 10
         else:
         	self.output += 10
+
+        # check family preparedness
+        if self.preparedness is "good":
+        	self.ouput += 10
+        else:
+        	self.output -+ 10
 
         fam_size = len(self.members)
         max_fam_hp = fam_size * 1000
