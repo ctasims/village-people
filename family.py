@@ -65,6 +65,24 @@ class Family:
         elif self.profession == 'crafter':
             self.village.supplies += output
 
+        # get food
+        if self.village.food >= self.req_food:
+        	self.food = self.req_food
+        	self.village.food -= self.req_food
+        else:  # not enough food to be well-fed
+        	self.food = self.village.food
+        	self.village.food = 0
+        	print "Not enough food!"
+
+        # get supplies
+        if self.village.supplies >= self.req_supplies:
+        	self.supplies = self.req_supplies
+        	self.village.supplies -= self.req_supplies
+        else:  # not enough supplies to be well-fed
+        	self.supplies = self.village.supplies
+        	self.village.supplies = 0
+        	print "Not enough supplies!"
+
         self.print_status()
 
 
@@ -147,11 +165,6 @@ class Family:
         If not enough, take what's left.
         Return amount of food taken.
         """
-        if total_village_food >= self.required_food:
-        	self.food = self.required_food
-        else:  # not enough food to be well-fed
-        	self.food = total_village_food
-        return self.food
 
     
     def get_house(self):
