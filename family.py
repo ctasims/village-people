@@ -1,3 +1,5 @@
+from house import House
+
 
 class Family:
     """ A family of villagers.
@@ -27,6 +29,7 @@ class Family:
 
         # on startup, dad will be None
         if dad is None:
+        	self.dad = None
         	self.living_with_parents = False
         	self.profession = profession
         else:
@@ -36,7 +39,7 @@ class Family:
 
         self.get_house()
         # set stats
-        self.monthly_update()
+        self.update_stats()
 
 
     def __repr__(self):
@@ -88,9 +91,6 @@ class Family:
         Should be called on every birth/death/new parent
         """
         members = []
-        if self.size is 0:
-            pass
-        else:
         members = [self.dad, self.mom] + self.kids
         members = filter(None, members)  # get rid of None elements
         if not members:

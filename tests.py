@@ -19,8 +19,10 @@ class TestVillager(unittest.TestCase):
 
     def setUp(self):
         self.vill = Village()
-        self.fam1 = Family()
-        self.fam2 = Family()
+        self.house1 = House()
+        self.house2 = House()
+        self.fam1 = Family(self.vill, self.house1)
+        self.fam2 = Family(self.vill, self.house2)
         self.dad = Villager(self.vill, self.fam1, 'm')
         self.mom = Villager(self.vill, self.fam2, 'f')
 
@@ -77,6 +79,8 @@ class TestVillager(unittest.TestCase):
         self.mom = None
         self.fam1 = None
         self.fam2 = None
+        self.house1 = None
+        self.house2 = None
 
 
 class TestFamily(unittest.TestCase):
@@ -84,8 +88,10 @@ class TestFamily(unittest.TestCase):
     def setUp(self):
         self.vill = Village()
         # need empty parent families. Once people come of age, these are empty.
-        self.fam1 = Family()
-        self.fam2 = Family()
+        self.house1 = House()
+        self.house2 = House()
+        self.fam1 = Family(self.vill, self.house1)
+        self.fam2 = Family(self.vill, self.house2)
         self.dad = Villager(self.vill, self.fam1, 'm')
         self.mom = Villager(self.vill, self.fam2, 'f')
         self.mom.force_grow_up()
@@ -106,15 +112,9 @@ class TestFamily(unittest.TestCase):
     def test_update_stats(self):
         self.dad.family.update_stats()
         self.assertEqual(self.dad.family.size, 2)
-
-    def test_compute_size(self):
-        self.dad.family.compute_size()
-        self.assertEqual(self.dad.family.size, 2)
-
-    def test_compute_reqs(self):
-        self.dad.family.compute_reqs()
         self.assertEqual(self.dad.family.req_food, 60)
         self.assertEqual(self.dad.family.req_supplies, 80)
+        self.assertEqual(self.dad.family.size, 2)
 
     def test_compute_hp(self):
         self.dad.family.compute_hp()
@@ -142,6 +142,8 @@ class TestFamily(unittest.TestCase):
         self.mom = None
         self.fam1 = None
         self.fam2 = None
+        self.house1 = None
+        self.house2 = None
 
 
 if __name__ == '__main__':

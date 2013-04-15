@@ -124,9 +124,18 @@ class Villager:
         	self.village.prospects.append(self)
         elif self.gender == 'm':
             if self.village.prospects:
-                self.spouse = self.village.prospects.pop()
-                self.spouse.spouse = self
-                self.spouse.family = self.family
+                # get married! If woman has children, they tag along
+                bride = self.village.prospects.pop()
+                kids = bride.family.kids
+                if kids is not None:
+                	# add kids to new dad's family and remove from old
+                    for kid in kids:
+                    	kid.family = self.family
+                        self.family.kids.append(kid)
+                    bride.family.kids = []
+                bride.family = self.family
+                bride.spouse = self
+                self.spouse = bride
                 self.family.add_mom(self.spouse)
                 print "\n%s married %s!" % (self, self.spouse)
             else:
