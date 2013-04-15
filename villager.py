@@ -38,6 +38,7 @@ class Villager:
         self.profession = None
         self.village.villagers.append(self)
         self.family = family
+        self.house = self.family.house
         self.__class__.num_villagers += 1
         self.id = self.__class__.num_villagers
         self.age_group = 0
@@ -86,8 +87,9 @@ class Villager:
         self.hp = 1000 if self.hp > 1000 else self.hp
         # adult only stuff
         if self.age > 16:
-            self.profession = self.village.update_profession(self)
-            print "\n%s is now a %s" % (self, self.profession)
+            # TODO: update prof sometimes?
+            #self.profession = self.village.update_profession(self)
+            print "\n{0} is now a {1}".format(self, self.profession)
         	# check for mate if single
             if self.spouse is None:
                 self.check_mate()
@@ -103,7 +105,8 @@ class Villager:
         if self.gender == 'm':
             self.family = Family(self)
             self.profession = self.village.new_profession(self)
-            print "\n%s becomes a %s" % (self, self.profession)
+            self.family.profession = self.profession
+            print "\n{0} becomes a {1}".format(self, self.profession)
         elif self.gender == 'f':
             pass
         else: 
@@ -115,7 +118,7 @@ class Villager:
 
     def check_mate(self):  # har har har
         """ grab mate from prospects list, if available
-        Called from grow_up.
+        Called from grow_up and on yearly update when adult is single.
         Villagers do not remarry if spouse dies.
         """
         # women go on prospects list

@@ -4,21 +4,30 @@ class Family:
     Families are created when a villager grows up and marries another from the prospect list.
     """
 
-    def __init__(self, dad=None):
+    def __init__(self, village, dad=None, house=None):
+        # dad is only None on startup, for initial families
+        # house is usually None, except on startup
         self.size = 1 if dad else 0
         self.dad = dad
+        self.village = village
         self.mom = None
         self.kids = []
 
         self.food = 0
         self.output = 1
-        self.house = None
+        if dad:
+            self.house = dad.house
+            self.living_with_parents = True
+        else:
+        	self.house = house
+            self.living_with_parents = False
         # set stats
         self.update_stats()
+        self.get_house()
 
 
     def __repr__(self):
-        return "family of %s" % self.dad
+        return "{0}'s family".format(self.dad)
 
 
     def get_members(self):
@@ -84,7 +93,8 @@ class Family:
 
 
     def get_groceries(self, total_village_food):
-        """ take family's desired monthly portion of food from village total.
+        """
+        take family's desired monthly portion of food from village total.
         If not enough, take what's left.
         Return amount of food taken.
         """
@@ -94,9 +104,23 @@ class Family:
         	self.food = total_village_food
         return self.food
 
+    
+    def get_house():
+        """
+        When family is living with parents of dad, try to get a diff house
+        """
+        available_supplies = self.village.supplies
+        if available_supplies >= 100:
+        	self.house = House()
+        	self.village.supplies -= 100
+        else:
+        	print "{0} can't get new house!".format(self)
+
+
 
     def compute_output(self):
-        """ family's profession output is based solely on family health.
+        """
+        family's profession output is based solely on family health.
         curr hp / max hp
         """
         if self.size is 0:
