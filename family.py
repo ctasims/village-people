@@ -4,30 +4,35 @@ class Family:
     Families are created when a villager grows up and marries another from the prospect list.
     """
 
-    def __init__(self, village, dad=None, house=None):
+    def __init__(self, village, house, dad=None):
         # dad is only None on startup, for initial families
-        # house is usually None, except on startup
+        # house is home of dad's parents. On startup it's just an empty house.
         self.size = 1 if dad else 0
         self.dad = dad
         self.village = village
+        self.house = house
         self.mom = None
         self.kids = []
 
         self.food = 0
         self.output = 1
-        if dad:
-            self.house = dad.house
-            self.living_with_parents = True
+
+        # on startup, dad will be None
+        if dad is None:
+        	self.living_with_parents = False
         else:
-        	self.house = house
-            self.living_with_parents = False
+            self.living_with_parents = True
+
+        self.get_house()
         # set stats
         self.update_stats()
-        self.get_house()
 
 
     def __repr__(self):
         return "{0}'s family".format(self.dad)
+
+
+    def monthly_update(self):
 
 
     def get_members(self):
@@ -105,14 +110,16 @@ class Family:
         return self.food
 
     
-    def get_house():
+    def get_house(self):
         """
-        When family is living with parents of dad, try to get a diff house
+        When family is living with parents of dad, try to get a diff house.
+        This requires subtracting supplies from village.
         """
         available_supplies = self.village.supplies
         if available_supplies >= 100:
         	self.house = House()
         	self.village.supplies -= 100
+        	self.living_with_parents = False
         else:
         	print "{0} can't get new house!".format(self)
 

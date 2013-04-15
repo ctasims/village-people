@@ -38,7 +38,6 @@ class Villager:
         self.profession = None
         self.village.villagers.append(self)
         self.family = family
-        self.house = self.family.house
         self.__class__.num_villagers += 1
         self.id = self.__class__.num_villagers
         self.age_group = 0
@@ -103,7 +102,7 @@ class Villager:
         # get profession
 
         if self.gender == 'm':
-            self.family = Family(self)
+            self.family = Family(self.village, self.family.house, dad=self,)
             self.profession = self.village.new_profession(self)
             self.family.profession = self.profession
             print "\n{0} becomes a {1}".format(self, self.profession)
