@@ -34,7 +34,7 @@ class Family:
 
         self.get_house()
         # set stats
-        self.update_stats()
+        self.monthly_update()
 
 
     def __repr__(self):
@@ -44,7 +44,23 @@ class Family:
     def monthly_update(self):
         """
         If family living with dad's parents, checks to build new one.
+        Updates output value.
         """
+        self.max_output = 0
+        if self.dad:
+        	self.max_output += 100
+        if self.mom:
+        	self.max_output += 100
+
+        self.compute_size()
+        self.compute_hp()
+        # compute required food and supplies
+        members = self.get_members()
+        self.req_food = sum([vill.req_food for vill in members])
+        self.req_supplies = sum([vill.req_supplies for vill in members])
+
+        # update max_output based on # parents
+        self.update_output()
 
 
     def get_members(self):
@@ -55,36 +71,12 @@ class Family:
         	return filter(None, members)  # get rid of None elements
 
 
-    def update_stats(self):
-        self.compute_size()
-        self.compute_reqs()
-        self.compute_hp()
-        # update max_output based on # parents
-        self.max_output = 0
-        if self.dad:
-        	self.max_output += 100
-        if self.mom:
-        	self.max_output += 100
-        self.update_output()
-
-        return self
-
-
     def compute_size(self):
         """ returns number of villagers in family
         Should be called every birth/death
         """
         self.size = len(self.get_members())
         return self.size
-
-
-    def compute_reqs(self):
-        """ Calculates required food and supplies for entire family
-        """
-        members = self.get_members()
-        self.req_food = sum([vill.req_food for vill in members])
-        self.req_supplies = sum([vill.req_supplies for vill in members])
-        return {'food': self.req_food, 'supplies': self.req_supplies}
 
 
     def compute_hp(self):
@@ -128,7 +120,7 @@ class Family:
         	print "family %s can't have kids - no mom!" % self
 
 
-    def get_groceries(self, total_village_food):
+    def get_food(self, total_village_food):
         """
         take family's desired monthly portion of food from village total.
         If not enough, take what's left.
@@ -155,10 +147,15 @@ class Family:
         	print "{0} can't get new house!".format(self)
 
 
+    def get_status(self):
+        print "{0}: hp {1}, output {2}".format(self, self.compute_hp(),
+                self.output)
+
 
     def update_output(self):
         """
-        Output is affected by house, health of villagers
+        Output is affected by house, health of villagers.
+        Update output every month.
         """
         if self.max_output == 0:
         	print "No family members!"
@@ -166,11 +163,19 @@ class Family:
 
         if self.living_with_parents:
         	self.output -= 10
+        else:
+        	self.output += 10
 
         fam_size = len(self.get_members())
         max_fam_hp = fam_size * 1000
         curr_fam_hp = self.compute_hp()
         self.output *= curr_fam_hp / max_fam_hp
+
+        # make sure it doesn't exceed max or go negative!
+        if self.output > self.max_output:
+        	self.output = self.max_output
+        elif self.output < 0:
+            self.output = 0
 
         return self.output
 
