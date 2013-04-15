@@ -10,6 +10,7 @@ class Village:
 
         self.villagers = []
         self.prospects = []  # list available mates
+        self.families = []
 
         # profs
         self.farmers = []
@@ -22,6 +23,10 @@ class Village:
 
         # houses
         self.houses = []
+
+
+
+
 
     def new_profession(self, villager):
         """ roll for new profession and assign villager to it.

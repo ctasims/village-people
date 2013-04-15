@@ -30,7 +30,7 @@ class Villager:
 
 
 
-    def __init__(self, village, family, manual_gender=None):
+    def __init__(self, village, family=None, manual_gender=None):
         """ Called on birth.
         assign id, get age/label, hp, and stats
         """
@@ -62,6 +62,10 @@ class Villager:
         # req supplies never changes
         self.req_supples = self.__class__.req_supplies
         self.nourishment = 3
+
+        # on startup, create family-less villagers
+        if family is None:
+            pass
 
     def __repr__(self):
         return self.name
@@ -113,7 +117,12 @@ class Villager:
 
         if self.gender == 'm':
             self.profession = self.village.new_profession(self)
-            self.family = Family(self.village, self.family.house, dad=self)
+            if self.family:
+                dad_house = self.family.house
+            else:
+                dad_house = None
+            self.family = Family(self.village, dad_house, dad=self)
+            self.village.families.append(self.family)
             print "\n{0} becomes a {1}".format(self, self.profession)
         elif self.gender == 'f':
             pass
@@ -136,7 +145,10 @@ class Villager:
             if self.village.prospects:
                 # get married! If woman has children, they tag along
                 bride = self.village.prospects.pop()
-                kids = bride.family.kids
+                if bride.family:
+                    kids = bride.family.kids
+                else:
+                    kids = None
                 if kids is not None:
                 	# add kids to new dad's family and remove from old
                     for kid in kids:
