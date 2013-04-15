@@ -46,43 +46,51 @@ class Family:
         If family living with dad's parents, checks to build new one.
         Updates output value.
         """
+        self.update_stats()
+        self.update_output()
+        # compute required food and supplies
+
+
+    def update_stats(self):
+        """
+        Update all stats of family to ensure everything jives.
+        Updates members, required stuff, output, max_output
+        """
+        members = self.get_members()  # update members
+        self.req_food = sum([vill.req_food for vill in members])
+        self.req_supplies = sum([vill.req_supplies for vill in members])
+        # update max_output based on # parents
         self.max_output = 0
         if self.dad:
         	self.max_output += 100
         if self.mom:
         	self.max_output += 100
-
-        self.compute_size()
         self.compute_hp()
-        # compute required food and supplies
-        members = self.get_members()
-        self.req_food = sum([vill.req_food for vill in members])
-        self.req_supplies = sum([vill.req_supplies for vill in members])
-
-        # update max_output based on # parents
-        self.update_output()
 
 
     def get_members(self):
-        if self.size is 0:
-        	return []
-        else:
-        	members = [self.dad, self.mom] + self.kids
-        	return filter(None, members)  # get rid of None elements
-
-
-    def compute_size(self):
-        """ returns number of villagers in family
-        Should be called every birth/death
         """
-        self.size = len(self.get_members())
-        return self.size
+        Determine family members and size of family.
+        Should be called on every birth/death/new parent
+        """
+        members = []
+        if self.size is 0:
+            pass
+        else:
+        members = [self.dad, self.mom] + self.kids
+        members = filter(None, members)  # get rid of None elements
+        if not members:
+        	self.size = 0
+        else:
+        	self.size = len(members)
+        self.members = members
+        return self.members
 
 
     def compute_hp(self):
         """ Calculates total health of family
         """
-        self.hp = sum([vill.hp for vill in self.get_members()])
+        self.hp = sum([vill.hp for vill in self.members])
         return self.hp
 
 
@@ -91,7 +99,6 @@ class Family:
         Called on marriage.
         """
         self.mom = villager
-        self.output += 100
         self.update_stats()
         return self
 
@@ -166,7 +173,7 @@ class Family:
         else:
         	self.output += 10
 
-        fam_size = len(self.get_members())
+        fam_size = len(self.members)
         max_fam_hp = fam_size * 1000
         curr_fam_hp = self.compute_hp()
         self.output *= curr_fam_hp / max_fam_hp
