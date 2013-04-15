@@ -20,6 +20,7 @@ class Villager:
     professions = ['farmer', 'craftsman', 'guard']
 
     # get list of random names
+    # from http://listofrandomnames.com/
     file = open('male_names.txt', 'r')
     male_names = file.read().splitlines()
     file.close()
