@@ -2,15 +2,24 @@
 class Family:
     """ A family of villagers.
     Families are created when a villager grows up and marries another from the prospect list.
+
+    The profession output is determined on a family-by-family basis.
+    Output is on scale of 1 to 200.
+    If only 1 parent, max is 100.
+    Output is affected by things like:
+    -- # family members
+    -- if family living with dad's parents
+    -- health of family members
     """
 
     def __init__(self, village, house, dad=None):
         # dad is only None on startup, for initial families
         # house is home of dad's parents. On startup it's just an empty house.
         self.size = 1 if dad else 0
-        self.dad = dad
         self.village = village
         self.house = house
+        self.dad = dad
+        self.output = 100
         self.mom = None
         self.kids = []
 
@@ -33,6 +42,9 @@ class Family:
 
 
     def monthly_update(self):
+        """
+        If family living with dad's parents, checks to build new one.
+        """
 
 
     def get_members(self):
@@ -47,7 +59,14 @@ class Family:
         self.compute_size()
         self.compute_reqs()
         self.compute_hp()
-        self.compute_output()
+        # update max_output based on # parents
+        self.max_output = 0
+        if self.dad:
+        	self.max_output += 100
+        if self.mom:
+        	self.max_output += 100
+        self.update_output()
+
         return self
 
 
@@ -79,9 +98,21 @@ class Family:
         """ add mom to family.
         Called on marriage.
         """
-        self.mom = villager 
+        self.mom = villager
+        self.output += 100
         self.update_stats()
         return self
+
+
+    def parent_died(self, gender):
+        if gender is 'f':
+        	# mom passed away :(
+        	self.mom = None
+        	pass
+        elif gender is 'm':
+            # dad passed away :(
+            self.dad = None
+        self.update_stats()
 
 
     def have_baby(self):
@@ -125,15 +156,21 @@ class Family:
 
 
 
-    def compute_output(self):
+    def update_output(self):
         """
-        family's profession output is based solely on family health.
-        curr hp / max hp
+        Output is affected by house, health of villagers
         """
-        if self.size is 0:
-        	self.output = 0
-        else:
-            max_output = 1000 * self.size
-            self.output = self.hp / max_output
+        if self.max_output == 0:
+        	print "No family members!"
+        	return
+
+        if self.living_with_parents:
+        	self.output -= 10
+
+        fam_size = len(self.get_members())
+        max_fam_hp = fam_size * 1000
+        curr_fam_hp = self.compute_hp()
+        self.output *= curr_fam_hp / max_fam_hp
+
         return self.output
 
