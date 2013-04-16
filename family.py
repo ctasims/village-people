@@ -86,6 +86,7 @@ class Family:
             print "{0} lacks supplies!".format(self)
 
         # villager update
+        # Also handle deaths
         dad_status = self.dad.monthly_update()
         if not dad_status:
             # dad died!
@@ -98,14 +99,22 @@ class Family:
             self.mom = None
             self.update_stats()
 
+        removal_indexes = []  # if child dies, need this to later remove them
         for kid in self.kids:
             status = kid.monthly_update()
             if not status:
             	# kid died!
-            	kid = None
-            	self.kids = filter(None, self.kids)
-            	self.update_stats()
+            	removal_indexes.append(self.kids.index(kid))
+        for indx in removal_indexes:
+        	self.kids.remove(self.kids[indx])
+        self.kids = filter(None, self.kids)
+        self.update_stats()
 
+        # if whole family dies off...
+        if self.size == 0:
+        	return False
+
+        # update family output
         output = self.update_output()
         if self.profession == 'farmer':
             self.village.food += output
@@ -113,6 +122,7 @@ class Family:
             self.village.supplies += output
 
         self.print_status()
+        return True
 
 
     def update_stats(self):

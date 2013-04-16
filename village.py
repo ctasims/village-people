@@ -28,7 +28,33 @@ class Village:
         self.empty_houses = []
 
 
+    def run_village(self, years):
+        num_years = 10
+        for year in range(num_years):
+            for month in range(10):
+                empty_families = []
 
+                for family in self.families:
+                    fam_status = family.monthly_update()
+                    if not fam_status:
+                    	empty_families.append(family)
+                    print "\n"
+                # if all members are dead, need to remove family
+                # what about house?
+                for empty_fam in empty_families:
+                	self.families.remove(empty_fam)
+                self.families = filter(None, self.families)
+
+                print "food: {0}, supplies {1}".format(self.food, self.supplies)
+            import pdb; pdb.set_trace()
+
+            # annual update for each family
+            for family in self.families:
+                family.yearly_update()
+
+            print "END OF YEAR"
+            print "food: {0}, supplies {1}".format(self.food, self.supplies)
+            print "{0} families".format(len(self.families))
 
 
     def new_profession(self, villager):

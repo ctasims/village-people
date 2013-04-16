@@ -77,13 +77,13 @@ class Villager:
         every month villagers get food and update their hp
         """
         if self.family.nourishment is "good":
-        	curr_hp = self.update_hp(20)
+        	self.update_hp(20)
         else:
-        	curr_hp = self.update_hp(-40)
+        	self.update_hp(-100)
 
         # villager dies!
-        if curr_hp < 0:
-        	die()
+        if self.hp == 0:
+            self.die()
             return False
 
         return True
@@ -125,6 +125,7 @@ class Villager:
         You have died!
         Notify your family.
         """
+        print "{0} HAS DIED!".format(self)
 
     def grow_up(self):
         """ upon reaching adulthood males start family and look for mate.

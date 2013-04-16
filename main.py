@@ -57,25 +57,8 @@ if __name__ == "__main__":
     create_initial_populace(vill, num_families)
 
     # start sim!
-    num_years = 10
-    num_months = 10
-
-    for year in range(num_years):
-        for month in range(num_months):
-
-            for family in vill.families:
-                family.monthly_update()
-                print "\n"
-            print "food: {0}, supplies {1}".format(vill.food, vill.supplies)
-            import pdb; pdb.set_trace()
-
-        # annual update for each family
-        for family in vill.families:
-            family.yearly_update()
-
-        print "END OF YEAR"
-        print "food: {0}, supplies {1}".format(vill.food, vill.supplies)
-        print "{0} families".format(len(vill.families))
+    years = 10
+    vill.run_village(years)
 
 
 
