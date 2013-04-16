@@ -16,7 +16,6 @@ def create_initial_populace(village, num_families):
     for indx in range(num_families):
         new_woman = Villager(village, None, 'f')
         new_woman.force_grow_up()
-    import pdb; pdb.set_trace()
     for indx in range(num_families):
         new_man = Villager(village, None, 'm')
         new_man.force_grow_up()
@@ -53,7 +52,8 @@ if __name__ == "__main__":
     houses = [House() for x in range(10)]
     vill.empty_houses = houses
     # create families
-    num_families = 10
+    num_families = 1
+    print "\n\n"
     create_initial_populace(vill, num_families)
 
     # start sim!
@@ -65,6 +65,9 @@ if __name__ == "__main__":
 
             for family in vill.families:
                 family.monthly_update()
+                print "\n"
+            print "food: {0}, supplies {1}".format(vill.food, vill.supplies)
+            import pdb; pdb.set_trace()
 
         # annual update for each family
         for family in vill.families:
@@ -73,7 +76,6 @@ if __name__ == "__main__":
         print "END OF YEAR"
         print "food: {0}, supplies {1}".format(vill.food, vill.supplies)
         print "{0} families".format(len(vill.families))
-        import pdb; pdb.set_trace()
 
 
 

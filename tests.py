@@ -19,32 +19,69 @@ class TestVillager(unittest.TestCase):
 
     def setUp(self):
         self.vill = Village()
-        self.house1 = House()
-        self.house2 = House()
-        self.fam1 = Family(self.vill, self.house1)
-        self.fam2 = Family(self.vill, self.house2)
-        self.dad = Villager(self.vill, self.fam1, 'm')
-        self.mom = Villager(self.vill, self.fam2, 'f')
+        self.dad = Villager(self.vill, None, 'm')
+        self.mom = Villager(self.vill, None, 'f')
 
     def test_init(self):
         self.assertEqual(self.dad.age, 0)
         self.assertEqual(self.dad.age_group, 0)
         self.assertEqual(self.dad.age_label, 'infant')
+        self.assertEqual(self.dad.nourishment, 3)
         self.assertTrue(self.vill.villagers)
-        self.assertNotEqual(self.fam1, self.fam2)
-        self.assertNotEqual(self.dad.family, self.mom.family)
+        self.assertEqual(self.dad.req_food, 15)
 
-    def test_birthday(self):
+    def test_one_birthday(self):
         self.dad.have_birthday()
         self.assertEqual(self.dad.age, 1)
         self.assertEqual(self.dad.age_group, 0)
         self.assertEqual(self.dad.age_label, 'infant')
+        self.assertEqual(self.dad.req_food, 15)
+
+    def test_grow_to_child(self):
+        for x in range(6):
+            self.dad.have_birthday()
+        self.assertEqual(self.dad.age, 6)
+        self.assertEqual(self.dad.age_group, 1)
+        self.assertEqual(self.dad.nourishment, 3)
+        self.assertEqual(self.dad.age_label, 'child')
+        self.assertEqual(self.dad.req_food, 15)
+
+    def test_grow_to_prime(self):
+        for x in range(16):
+            self.dad.have_birthday()
+        self.assertEqual(self.dad.age, 16)
+        self.assertEqual(self.dad.age_group, 2)
+        self.assertEqual(self.dad.nourishment, 3)
+        self.assertEqual(self.dad.age_label, 'prime')
+        self.assertEqual(self.dad.req_food, 30)
+        # villager will have house built from village supplies
+        self.assertFalse(self.dad.family.house == None)
+
+    def test_grow_to_middle_age(self):
+        for x in range(41):
+            self.dad.have_birthday()
+        self.assertEqual(self.dad.age, 41)
+        self.assertEqual(self.dad.age_group, 3)
+        self.assertEqual(self.dad.nourishment, 3)
+        self.assertEqual(self.dad.age_label, 'middle')
+        self.assertEqual(self.dad.req_food, 30)
+
+    def test_grow_to_old_age(self):
+        for x in range(61):
+            self.dad.have_birthday()
+        self.assertEqual(self.dad.age, 61)
+        self.assertEqual(self.dad.age_group, 4)
+        self.assertEqual(self.dad.nourishment, 3)
+        self.assertEqual(self.dad.age_label, 'old')
+        self.assertEqual(self.dad.req_food, 30)
 
     def test_force_grow_up_male(self):
         self.dad.force_grow_up()
         self.assertEqual(self.dad.age, 16)
         self.assertEqual(self.dad.age_group, 2)
         self.assertEqual(self.dad.age_label, 'prime')
+        self.assertEqual(self.dad.req_food, 30)
+        self.assertEqual(self.dad.hp, 1000)
         self.assertFalse(self.vill.prospects)
 
     def test_force_grow_up_female(self):
@@ -52,6 +89,8 @@ class TestVillager(unittest.TestCase):
         self.assertEqual(self.mom.age, 16)
         self.assertEqual(self.mom.age_group, 2)
         self.assertEqual(self.mom.age_label, 'prime')
+        self.assertEqual(self.mom.req_food, 30)
+        self.assertEqual(self.mom.hp, 1000)
         self.assertTrue(self.vill.prospects)
 
     def test_grow_up_male(self):
@@ -77,10 +116,6 @@ class TestVillager(unittest.TestCase):
         self.vill = None
         self.dad = None
         self.mom = None
-        self.fam1 = None
-        self.fam2 = None
-        self.house1 = None
-        self.house2 = None
 
 
 class TestFamily(unittest.TestCase):
@@ -88,12 +123,8 @@ class TestFamily(unittest.TestCase):
     def setUp(self):
         self.vill = Village()
         # need empty parent families. Once people come of age, these are empty.
-        self.house1 = House()
-        self.house2 = House()
-        self.fam1 = Family(self.vill, self.house1)
-        self.fam2 = Family(self.vill, self.house2)
-        self.dad = Villager(self.vill, self.fam1, 'm')
-        self.mom = Villager(self.vill, self.fam2, 'f')
+        self.dad = Villager(self.vill, None, 'm')
+        self.mom = Villager(self.vill, None, 'f')
         self.mom.force_grow_up()
         self.dad.force_grow_up()  # mom available
 
@@ -140,10 +171,6 @@ class TestFamily(unittest.TestCase):
         self.vill = None
         self.dad = None
         self.mom = None
-        self.fam1 = None
-        self.fam2 = None
-        self.house1 = None
-        self.house2 = None
 
 
 if __name__ == '__main__':

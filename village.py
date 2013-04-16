@@ -15,14 +15,17 @@ class Village:
         # profs
         self.farmers = []
         self.crafters = []
-        self.guards = []
-        self.farmer_rate = 0.33
-        self.crafter_rate = 0.66
-        self.guard_rate = 0.99
+        #self.guards = []
+        self.farmer_rate = 0.50
+        self.crafter_rate = 0.99
+        #self.farmer_rate = 0.33
+        #self.crafter_rate = 0.66
+        #self.guard_rate = 0.99
         self.new_prof_rate = 0.10
 
         # houses
         self.houses = []
+        self.empty_houses = []
 
 
 
@@ -46,8 +49,9 @@ class Village:
         	self.crafters.append(villager)
         	return 'crafter'
         else:
-        	self.guards.append(villager)
-        	return 'guard'
+        	raise Exception("No prof!")
+            #self.guards.append(villager)
+            #return 'guard'
 
     def update_profession(self, villager):
         """ every year, adult villagers 

@@ -26,7 +26,6 @@ class Family:
         self.kids = []
 
         self.food = 0
-        self.output = 1
 
         # on startup, profession manually assigned
         if profession is not None:
@@ -67,26 +66,45 @@ class Family:
             self.food = self.req_food
             self.nourishment = "good"
             self.village.food -= self.req_food
+            print "{0} found food".format(self)
         else:  # not enough food to be well-fed
             self.food = self.village.food
             self.nourishment = "poor"
             self.village.food = 0
-            print "Not enough food!"
+            print "{0} lacks food!".format(self)
 
         # get supplies
         if self.village.supplies >= self.req_supplies:
             self.supplies = self.req_supplies
             self.preparedness = "good"
             self.village.supplies -= self.req_supplies
+            print "{0} found supplies".format(self)
         else:  # not enough supplies for max output
             self.supplies = self.village.supplies
             self.preparedness = "poor"
             self.village.supplies = 0
-            print "Not enough supplies!"
+            print "{0} lacks supplies!".format(self)
 
         # villager update
-        for member in self.members:
-            member.monthly_update()
+        dad_status = self.dad.monthly_update()
+        if not dad_status:
+            # dad died!
+            self.dad = None
+            self.update_stats()
+
+        mom_status = self.mom.monthly_update()
+        if not mom_status:
+            # mom died!
+            self.mom = None
+            self.update_stats()
+
+        for kid in self.kids:
+            status = kid.monthly_update()
+            if not status:
+            	# kid died!
+            	kid = None
+            	self.kids = filter(None, self.kids)
+            	self.update_stats()
 
         output = self.update_output()
         if self.profession == 'farmer':
@@ -111,6 +129,7 @@ class Family:
             self.max_output += 100
         if self.mom:
             self.max_output += 100
+        self.output = self.max_output
         self.compute_hp()
 
 
@@ -142,19 +161,20 @@ class Family:
         Called on marriage.
         """
         self.mom = villager
+        self.output += 100
         self.update_stats()
         return self
 
 
-    def parent_died(self, gender):
-        if gender is 'f':
-            # mom passed away :(
-            self.mom = None
-            pass
-        elif gender is 'm':
-            # dad passed away :(
-            self.dad = None
-            self.update_stats()
+    #def parent_died(self, gender):
+        #if gender is 'f':
+            ## mom passed away :(
+            #self.mom = None
+            #pass
+        #elif gender is 'm':
+            ## dad passed away :(
+            #self.dad = None
+            #self.update_stats()
 
 
     def have_baby(self):
@@ -179,7 +199,7 @@ class Family:
         if self.village.empty_houses:
             self.house = self.village.empty_houses.pop()
             self.living_with_parents = False
-            print "{0} found empty house!".format(self)
+            print "{0} found an empty house!".format(self)
             return
 
         available_supplies = self.village.supplies
@@ -190,7 +210,6 @@ class Family:
         else:
             print "{0} can't get new house!".format(self)
         return
-
 
 
     def print_status(self):
@@ -221,8 +240,8 @@ class Family:
 
         fam_size = len(self.members)
         max_fam_hp = fam_size * 1000
-        curr_fam_hp = self.compute_hp()
-        self.output *= curr_fam_hp / max_fam_hp
+        curr_fam_hp = float(self.compute_hp())
+        self.output = round(self.output * curr_fam_hp / max_fam_hp)
 
         # make sure it doesn't exceed max or go negative!
         if self.output > self.max_output:

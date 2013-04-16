@@ -14,7 +14,7 @@ class Villager:
     age_hp = [20, 100, 100, -100, -400]
     num_villagers = 0
     req_food = 30
-    req_supplies = 40
+    req_supplies = 30
     genders = ['f', 'm']
     next_gender = 1
     professions = ['farmer', 'crafter', 'guard']
@@ -38,6 +38,7 @@ class Villager:
         self.profession = None
         self.village.villagers.append(self)
         self.family = family
+        self.spouse = None
         self.__class__.num_villagers += 1
         self.id = self.__class__.num_villagers
         self.age_group = 0
@@ -76,10 +77,22 @@ class Villager:
         every month villagers get food and update their hp
         """
         if self.family.nourishment is "good":
-        	self.hp += 20
+        	curr_hp = self.update_hp(20)
         else:
-        	self.hp -= 40
+        	curr_hp = self.update_hp(-40)
 
+        # villager dies!
+        if curr_hp < 0:
+        	die()
+            return False
+
+        return True
+
+    def update_hp(self, mod):
+        self.hp += mod
+        self.hp = 1000 if self.hp > 1000 else self.hp
+        self.hp = 0 if self.hp < 0 else self.hp
+        return self.hp
 
     def have_birthday(self):
         """ every year, advance villager's age and refresh stats
@@ -96,8 +109,7 @@ class Villager:
         if self.age == 16:
             self.grow_up()
         # adjust hp
-        self.hp += self.__class__.age_hp[self.age_group]
-        self.hp = 1000 if self.hp > 1000 else self.hp
+        self.update_hp(self.__class__.age_hp[self.age_group])
         # adult only stuff
         if self.age > 16:
             # TODO: update prof sometimes?
@@ -107,6 +119,12 @@ class Villager:
             if self.spouse is None:
                 self.check_mate()
 
+
+    def die(self):
+        """
+        You have died!
+        Notify your family.
+        """
 
     def grow_up(self):
         """ upon reaching adulthood males start family and look for mate.
