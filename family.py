@@ -66,24 +66,24 @@ class Family:
             self.food = self.req_food
             self.nourishment = "good"
             self.village.food -= self.req_food
-            print "{0} found food".format(self)
+            #print "{0} found food".format(self)
         else:  # not enough food to be well-fed
             self.food = self.village.food
             self.nourishment = "poor"
             self.village.food = 0
-            print "{0} lacks food!".format(self)
+            #print "{0} lacks food!".format(self)
 
         # get supplies
         if self.village.supplies >= self.req_supplies:
             self.supplies = self.req_supplies
             self.preparedness = "good"
             self.village.supplies -= self.req_supplies
-            print "{0} found supplies".format(self)
+            #print "{0} found supplies".format(self)
         else:  # not enough supplies for max output
             self.supplies = self.village.supplies
             self.preparedness = "poor"
             self.village.supplies = 0
-            print "{0} lacks supplies!".format(self)
+            #print "{0} lacks supplies!".format(self)
 
         # villager update
         # Also handle deaths
@@ -223,8 +223,15 @@ class Family:
 
 
     def print_status(self):
-        print "{0}: hp {1}, output {2}".format(self, self.compute_hp(),
-                self.output)
+        if self.profession == 'crafter':
+        	food = "-"
+        	craft = self.output
+        else:
+        	food = self.output
+        	craft = "-"
+
+        print "{0}:\t hp {1} \t {2} \t {3}".format(self, self.compute_hp(),
+                food, craft)
 
 
     def update_output(self):

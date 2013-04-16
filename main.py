@@ -57,7 +57,7 @@ if __name__ == "__main__":
     create_initial_populace(vill, num_families)
 
     # start sim!
-    years = 10
+    years = 4
     vill.run_village(years)
 
 
