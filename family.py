@@ -139,7 +139,7 @@ class Family:
             self.max_output += 100
         if self.mom:
             self.max_output += 100
-        self.output = self.max_output
+        #self.output = self.max_output
         self.compute_hp()
 
 
@@ -258,7 +258,18 @@ class Family:
         fam_size = len(self.members)
         max_fam_hp = fam_size * 1000
         curr_fam_hp = float(self.compute_hp())
-        self.output = round(self.output * curr_fam_hp / max_fam_hp)
+        hp_ratio = curr_fam_hp / max_fam_hp
+        # hp ratio effects on output:
+        # 1/2 to 1: none
+        # 1/4 to 1/2: -20
+        # 0 to 1/4: -50
+        if 1/2 < hp_ratio <= 1:
+        	pass
+        elif 1/4 < hp_ratio <= 1/2:
+            self.output -= 20
+        else:
+        	self.output -= 50
+        #self.output = round(self.output * curr_fam_hp / max_fam_hp)
 
         # make sure it doesn't exceed max or go negative!
         if self.output > self.max_output:
