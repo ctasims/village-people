@@ -14,7 +14,7 @@ class Villager:
     age_hp = [20, 100, 100, -100, -400]
     num_villagers = 0
     req_food = 30
-    req_goods = 30
+    req_goods = 10
     genders = ['f', 'm']
     next_gender = 1
     professions = ['farmer', 'crafter', 'guard']
@@ -61,8 +61,7 @@ class Villager:
         # req_food only changes at adulthood
         self.req_food = self.__class__.req_food / 2
         # req goods never changes
-        self.req_supples = self.__class__.req_goods
-        self.nourishment = 3
+        self.req_goods = self.__class__.req_goods
 
         # on startup, create family-less villagers
         if family is None:
@@ -127,8 +126,18 @@ class Villager:
         """
         You have died!
         Notify your family.
+        If male, remove from prof list
         """
+        self.village.villagers.remove(self)
+        if self.gender == 'm' and self.age >= 16:
+            if self.profession == 'farmer':
+            	self.village.farmers.remove(self)
+            elif self.profession == 'crafter':
+            	self.village.crafters.remove(self)
+            else:
+                raise Exception("ERROR: no profession!")
         print "{0} HAS DIED!".format(self)
+
 
     def grow_up(self, profession=None):
         """ upon reaching adulthood males start family and look for mate.

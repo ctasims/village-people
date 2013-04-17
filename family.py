@@ -13,14 +13,16 @@ class Family:
     -- if family living with dad's parents
     -- health of family members
     """
+    self.max_solo_outputs = {'farmer': 60, 'crafter': 20}
 
     def __init__(self, village, house, dad, profession=None):
         # dad is only None on startup, for initial families
+        # dad is the dad of THIS family, i.e. the main man
         # house is home of dad's parents. On startup it's just an empty house.
         self.size = 1 if dad else 0
         self.village = village
         self.house = house
-        self.output = 100
+        self.output = None  # depends on profession
         self.mom = None
         self.dad = dad
         self.kids = []
@@ -34,6 +36,10 @@ class Family:
         else:
             self.profession = self.dad.profession
             self.living_with_parents = True
+        self.output = self.__class__.max_solo_outputs[self.profession]
+        # increase output base amt
+        self.__class__.max_solo_outputs[self.profession] *= 1.25
+
 
         self.get_house()
         # set stats
@@ -87,12 +93,14 @@ class Family:
         if not dad_status:
             # dad died!
             self.dad = None
+            self.__class__.max_solo_outputs[self.profession] *= 0.75
             self.update_stats()
 
         mom_status = self.mom.monthly_update()
         if not mom_status:
             # mom died!
             self.mom = None
+            self.__class__.max_solo_outputs[self.profession] *= 0.75
             self.update_stats()
 
         removal_indexes = []  # if child dies, need this to later remove them
@@ -108,6 +116,10 @@ class Family:
 
         # if whole family dies off...
         if self.size == 0:
+        	self.village.families.remove(self)
+            # if we had a home, make it empty
+            if not self.lives_with_parents:
+                self.village.empty_houses.append(self.house)
         	return False
 
         # update family output
@@ -131,10 +143,11 @@ class Family:
         self.req_goods = sum([vill.req_goods for vill in members])
         # update max_output based on # parents
         self.max_output = 0
+        self.max_solo_output = self.__class__.max_solo_outputs[self.profession]
         if self.dad:
-            self.max_output += 100
+            self.max_output += self.max_solo_output
         if self.mom:
-            self.max_output += 100
+            self.max_output += self.max_solo_output
         #self.output = self.max_output
         self.compute_hp()
 
@@ -167,7 +180,8 @@ class Family:
         Called on marriage.
         """
         self.mom = villager
-        self.output += 100
+        self.output += self.max_solo_output
+        self.__class__.max_solo_outputs[self.profession] *= 1.25
         self.update_stats()
         return self
 
@@ -237,6 +251,7 @@ class Family:
         With no goods, family will last for 1 year.
         """
         max_o = self.max_output
+        max_solo = self.max_solo_output
         if max_o == 0:
             print "No family members!"
             return
@@ -248,7 +263,7 @@ class Family:
 
         # living at home means lower productivity
         if self.living_with_parents:
-            self.output -= 20
+            self.output -= max_solo * 0.20
         else:
         	pass
 
@@ -258,9 +273,9 @@ class Family:
 
         # check family preparedness
         if self.preparedness is "good":
-            self.output += 10
+            self.output += max_solo * 0.10
         else:
-            self.output -= 20
+            self.output -= max_solo * 0.20
         # adjust for going over max or below min
         self.output = max_o if self.output > max_o else self.output
         self.output = 0 if self.output < 0 else self.output
@@ -268,9 +283,9 @@ class Family:
         if 0.5 < hp_ratio <= 1:
         	pass
         elif 0.25 < hp_ratio <= 0.5:
-            self.output -= 20
+            self.output -= max_solo * 0.20
         else:
-        	self.output -= 50
+        	self.output -= max_solo * 0.50
         # adjust for going over max or below min
         self.output = max_o if self.output > max_o else self.output
         self.output = 0 if self.output < 0 else self.output
