@@ -41,7 +41,7 @@ class Family:
 
 
     def __repr__(self):
-        return "{0}'s family".format(self.dad)
+        return "{0}".format(self.dad)
 
 
     def yearly_update(self):
@@ -66,24 +66,20 @@ class Family:
             self.food = self.req_food
             self.nourishment = "good"
             self.village.food -= self.req_food
-            #print "{0} found food".format(self)
         else:  # not enough food to be well-fed
             self.food = self.village.food
             self.nourishment = "poor"
             self.village.food = 0
-            #print "{0} lacks food!".format(self)
 
         # get supplies
         if self.village.supplies >= self.req_supplies:
             self.supplies = self.req_supplies
             self.preparedness = "good"
             self.village.supplies -= self.req_supplies
-            #print "{0} found supplies".format(self)
         else:  # not enough supplies for max output
             self.supplies = self.village.supplies
             self.preparedness = "poor"
             self.village.supplies = 0
-            #print "{0} lacks supplies!".format(self)
 
         # villager update
         # Also handle deaths
@@ -238,44 +234,46 @@ class Family:
         """
         Output is affected by house, health of villagers.
         Update output every month.
+        With no supplies, family will last for 1 year.
         """
-        if self.max_output == 0:
+        max_o = self.max_output
+        if max_o == 0:
             print "No family members!"
             return
-
-        # living at home means lower productivity
-        if self.living_with_parents:
-            self.output -= 10
-        else:
-            self.output += 10
-
-        # check family preparedness
-        if self.preparedness is "good":
-            self.output += 10
-        else:
-            self.output -+ 10
 
         fam_size = len(self.members)
         max_fam_hp = fam_size * 1000
         curr_fam_hp = float(self.compute_hp())
         hp_ratio = curr_fam_hp / max_fam_hp
-        # hp ratio effects on output:
-        # 1/2 to 1: none
-        # 1/4 to 1/2: -20
-        # 0 to 1/4: -50
-        if 1/2 < hp_ratio <= 1:
+
+        # living at home means lower productivity
+        if self.living_with_parents:
+            self.output -= 20
+        else:
         	pass
-        elif 1/4 < hp_ratio <= 1/2:
+
+        # adjust for going over max or below min
+        self.output = max_o if self.output > max_o else self.output
+        self.output = 0 if self.output < 0 else self.output
+
+        # check family preparedness
+        if self.preparedness is "good":
+            self.output += 10
+        else:
+            self.output -= 20
+        # adjust for going over max or below min
+        self.output = max_o if self.output > max_o else self.output
+        self.output = 0 if self.output < 0 else self.output
+
+        if 0.5 < hp_ratio <= 1:
+        	pass
+        elif 0.25 < hp_ratio <= 0.5:
             self.output -= 20
         else:
         	self.output -= 50
-        #self.output = round(self.output * curr_fam_hp / max_fam_hp)
-
-        # make sure it doesn't exceed max or go negative!
-        if self.output > self.max_output:
-            self.output = self.max_output
-        elif self.output < 0:
-            self.output = 0
+        # adjust for going over max or below min
+        self.output = max_o if self.output > max_o else self.output
+        self.output = 0 if self.output < 0 else self.output
 
         return self.output
 

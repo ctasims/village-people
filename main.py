@@ -52,12 +52,12 @@ if __name__ == "__main__":
     houses = [House() for x in range(10)]
     vill.empty_houses = houses
     # create families
-    num_families = 2
+    num_families = 1
     print "\n\n"
     create_initial_populace(vill, num_families)
 
     # start sim!
-    years = 40
+    years = 4
     vill.run_village(years)
 
 

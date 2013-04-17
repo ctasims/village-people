@@ -74,12 +74,13 @@ class Villager:
 
     def monthly_update(self):
         """
-        every month villagers get food and update their hp
+        every month villagers get food and update their hp.
+        Without food, family will last 2-3 months before dying.
         """
         if self.family.nourishment is "good":
         	self.update_hp(20)
         else:
-        	self.update_hp(-100)
+        	self.update_hp(-300)
 
         # villager dies!
         if self.hp == 0:
