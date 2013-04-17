@@ -1,4 +1,5 @@
 from house import House
+import random
 
 
 class Family:
@@ -51,12 +52,25 @@ class Family:
     def __repr__(self):
         return "{0}".format(self.dad)
 
+    def print_status(self):
+        if self.profession == 'crafter':
+        	food = "-"
+        	craft = self.output
+        else:
+        	food = self.output
+        	craft = "-"
+        print "%-10.10s hp: %6d %6s %6s" % (self, self.compute_hp(), food,craft)
+
 
     def yearly_update(self):
-        self.dad.birthday()
-        self.mom.birthday()
+        if self.dad:
+            self.dad.birthday()
+        if self.mom:
+            self.mom.birthday()
         for kid in self.kids:
         	kid.birthday()
+        self.check_for_baby(0.25)
+
 
     def monthly_update(self):
         """
@@ -93,7 +107,10 @@ class Family:
 
         # villager update
         # Also handle deaths
-        dad_status = self.dad.monthly_update()
+        if self.dad:
+            dad_status = self.dad.monthly_update()
+        else:
+        	dad_status = None
         if not dad_status:
             # dad died!
             self.dad = None
@@ -101,7 +118,10 @@ class Family:
             self.__class__.max_solo_outputs[prof] = round(self.__class__.max_solo_outputs[prof] * 0.90)
             self.update_stats()
 
-        mom_status = self.mom.monthly_update()
+        if self.mom:
+            mom_status = self.mom.monthly_update()
+        else:
+        	mom_status = None
         if not mom_status:
             # mom died!
             self.mom = None
@@ -116,7 +136,7 @@ class Family:
             	# kid died!
             	removal_indexes.append(self.kids.index(kid))
         for indx in removal_indexes:
-        	self.kids.remove(self.kids[indx])
+        	self.kids[indx] = None
         self.kids = filter(None, self.kids)
         self.update_stats()
 
@@ -208,17 +228,21 @@ class Family:
             #self.update_stats()
 
 
-    def have_baby(self):
+    def check_for_baby(self, chance):
         """ have a new baby in family.
         Called by ???
         """
-        if self.mom:
-            baby = self.mom.give_birth()
-            self.kids.append(baby)
-            self.update_stats()
-            return baby
+        if random.random() < chance:
+            if self.mom:
+                baby = self.mom.give_birth()
+                self.kids.append(baby)
+                self.update_stats()
+                print "{0} HAD A BABY!!".format(self)
+                return baby
+            else:
+                print "family %s can't have kids - no mom!" % self
         else:
-            print "family %s can't have kids - no mom!" % self
+        	pass
 
 
     def get_house(self):
@@ -241,16 +265,6 @@ class Family:
         else:
             print "{0} can't get new house!".format(self)
         return
-
-
-    def print_status(self):
-        if self.profession == 'crafter':
-        	food = "-"
-        	craft = self.output
-        else:
-        	food = self.output
-        	craft = "-"
-        print "%-10.10s hp: %6d %6s %6s" % (self, self.compute_hp(), food,craft)
 
 
     def update_output(self):

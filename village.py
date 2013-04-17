@@ -17,7 +17,7 @@ class Village:
         self.crafters = []
         #self.guards = []
         self.farmer_rate = 0.50
-        self.crafter_rate = 0.99
+        self.crafter_rate = 1.0
         #self.farmer_rate = 0.33
         #self.crafter_rate = 0.66
         #self.guard_rate = 0.99
@@ -38,7 +38,8 @@ class Village:
                 #pdb.set_trace()
             print "\n\n====== YEAR {0} ======".format(year)
             print "food: {0}, goods {1}".format(self.food, self.goods)
-            print "{0} families".format(len(self.families))
+            print "{0} families, {1} villagers".format(len(self.families),
+                len(self.villagers))
             for month in range(10):
                 #print "\n-- MONTH {0} --".format(month)
                 for family in self.families:

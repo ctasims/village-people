@@ -25,7 +25,7 @@ def create_initial_populace(village, num_families, professions):
 
     # start with 1 kid each
     for family in village.families:
-        family.have_baby()
+        family.check_for_baby(1)
 
     # should have 30 people total, now
 
