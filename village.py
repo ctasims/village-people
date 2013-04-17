@@ -30,25 +30,20 @@ class Village:
 
     def run_village(self, years):
         for year in range(years):
-            if year == 16:
-            	import pdb
-            	pdb.set_trace()
+            if self.families == []:
+                print "ALL GONE YOU FAIL"
+                break
+            #if year == 16:
+                #import pdb
+                #pdb.set_trace()
             print "\n\n====== YEAR {0} ======".format(year)
             print "food: {0}, goods {1}".format(self.food, self.goods)
             print "{0} families".format(len(self.families))
             for month in range(10):
                 #print "\n-- MONTH {0} --".format(month)
-                empty_families = []
-
                 for family in self.families:
                     fam_status = family.monthly_update()
-                    if not fam_status:
-                    	empty_families.append(family)
-                # if all members are dead, need to remove family
-                # what about house?
-                for empty_fam in empty_families:
-                	self.families.remove(empty_fam)
-                self.families = filter(None, self.families)
+                    #import pdb; pdb.set_trace()
 
                 print "VILLAGE: {0}/{1}".format(self.food, self.goods)
             #import pdb; pdb.set_trace()

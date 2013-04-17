@@ -25,6 +25,7 @@ class Family:
         self.output = None  # depends on profession
         self.mom = None
         self.dad = dad
+        self.nourishment = "good"
         self.kids = []
 
         self.food = 0
@@ -69,7 +70,6 @@ class Family:
 
         if self.living_with_parents:
             self.get_house()
-
 
         # get food
         if self.village.food >= self.req_food:
@@ -123,6 +123,7 @@ class Family:
         # if whole family dies off...
         if self.size == 0:
             self.village.families.remove(self)
+            self.village.families = filter(None, self.village.families)
 
             if self.house:
                 self.village.empty_houses.append(self.house)
@@ -249,9 +250,7 @@ class Family:
         else:
         	food = self.output
         	craft = "-"
-
-        print "%-10.10s hp: %6d %6s %6s" % (self, self.compute_hp(), food,
-                craft)
+        print "%-10.10s hp: %6d %6s %6s" % (self, self.compute_hp(), food,craft)
 
 
     def update_output(self):

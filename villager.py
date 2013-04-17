@@ -110,13 +110,10 @@ class Villager:
                 pass
         if self.age == 16:
             self.grow_up(profession)
-        # adjust hp
-        self.update_hp(self.__class__.age_hp[self.age_group])
+        elif self.age > 16:
         # adult only stuff
-        if self.age > 16:
             # TODO: update prof sometimes?
             #self.profession = self.village.update_profession(self)
-            print "\n{0} is now a {1}".format(self, self.profession)
         	# check for mate if single
             if self.spouse is None:
                 self.check_mate()
@@ -151,13 +148,15 @@ class Villager:
             self.profession = self.village.new_profession(self, profession)
             if self.family:
                 dad_house = self.family.house
+                self.family.kids.remove(self)
             else:
                 dad_house = None
             self.family = Family(self.village, dad_house, dad=self)
             self.village.families.append(self.family)
             print "\n{0} becomes a {1}".format(self, self.profession)
         elif self.gender == 'f':
-            pass
+            if self.family:
+                self.family.kids.remove(self)
         else: 
         	raise Exception("no gender!")
 
@@ -212,6 +211,7 @@ class Villager:
         """
         while self.age is not 16:
         	self.birthday(profession)
+        self.hp = 1000
         return self
 
 
