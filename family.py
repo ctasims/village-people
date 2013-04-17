@@ -13,7 +13,7 @@ class Family:
     -- if family living with dad's parents
     -- health of family members
     """
-    self.max_solo_outputs = {'farmer': 60, 'crafter': 20}
+    max_solo_outputs = {'farmer': 60, 'crafter': 20}
 
     def __init__(self, village, house, dad, profession=None):
         # dad is only None on startup, for initial families
@@ -38,7 +38,8 @@ class Family:
             self.living_with_parents = True
         self.output = self.__class__.max_solo_outputs[self.profession]
         # increase output base amt
-        self.__class__.max_solo_outputs[self.profession] *= 1.25
+        prof = self.profession
+        self.__class__.max_solo_outputs[prof] = round(self.__class__.max_solo_outputs[prof] * 1.1)
 
 
         self.get_house()
@@ -51,7 +52,10 @@ class Family:
 
 
     def yearly_update(self):
-        pass
+        self.dad.birthday()
+        self.mom.birthday()
+        for kid in self.kids:
+        	kid.birthday()
 
     def monthly_update(self):
         """
@@ -93,14 +97,16 @@ class Family:
         if not dad_status:
             # dad died!
             self.dad = None
-            self.__class__.max_solo_outputs[self.profession] *= 0.75
+            prof = self.profession
+            self.__class__.max_solo_outputs[prof] = round(self.__class__.max_solo_outputs[prof] * 0.90)
             self.update_stats()
 
         mom_status = self.mom.monthly_update()
         if not mom_status:
             # mom died!
             self.mom = None
-            self.__class__.max_solo_outputs[self.profession] *= 0.75
+            prof = self.profession
+            self.__class__.max_solo_outputs[prof] = round(self.__class__.max_solo_outputs[prof] * 0.90)
             self.update_stats()
 
         removal_indexes = []  # if child dies, need this to later remove them
@@ -116,10 +122,11 @@ class Family:
 
         # if whole family dies off...
         if self.size == 0:
-        	self.village.families.remove(self)
-            # if we had a home, make it empty
-            if not self.lives_with_parents:
+            self.village.families.remove(self)
+
+            if self.house:
                 self.village.empty_houses.append(self.house)
+
         	return False
 
         # update family output
@@ -148,6 +155,8 @@ class Family:
             self.max_output += self.max_solo_output
         if self.mom:
             self.max_output += self.max_solo_output
+        if self.kids:
+        	self.max_output += len(self.kids) * self.max_solo_output
         #self.output = self.max_output
         self.compute_hp()
 
@@ -181,7 +190,8 @@ class Family:
         """
         self.mom = villager
         self.output += self.max_solo_output
-        self.__class__.max_solo_outputs[self.profession] *= 1.25
+        prof = self.profession
+        self.__class__.max_solo_outputs[prof] = round(self.__class__.max_solo_outputs[prof] * 1.1)
         self.update_stats()
         return self
 

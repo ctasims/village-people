@@ -94,7 +94,7 @@ class Villager:
         self.hp = 0 if self.hp < 0 else self.hp
         return self.hp
 
-    def have_birthday(self, profession=None):
+    def birthday(self, profession=None):
         """ every year, advance villager's age and refresh stats
         Can set profession manually. Only applies once they grow up.
         Yes, it's a hack...
@@ -175,6 +175,14 @@ class Villager:
         	self.village.prospects.append(self)
         elif self.gender == 'm':
             if self.village.prospects:
+                for girl in self.village.prospects:
+                    if girl.family == self.family:  # sister!
+                    	continue
+                    else:
+                    	bride = girl
+                    	break
+                if bride is None:  # prospects are all sisters
+                	return self
                 # get married! If woman has children, they tag along
                 bride = self.village.prospects.pop()
                 if bride.family:
@@ -203,7 +211,7 @@ class Villager:
         Used when populating village for first time with villagers.
         """
         while self.age is not 16:
-        	self.have_birthday(profession)
+        	self.birthday(profession)
         return self
 
 

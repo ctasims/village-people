@@ -30,11 +30,14 @@ class Village:
 
     def run_village(self, years):
         for year in range(years):
+            if year == 16:
+            	import pdb
+            	pdb.set_trace()
             print "\n\n====== YEAR {0} ======".format(year)
             print "food: {0}, goods {1}".format(self.food, self.goods)
             print "{0} families".format(len(self.families))
             for month in range(10):
-            	print "\n-- MONTH {0} --".format(month)
+                #print "\n-- MONTH {0} --".format(month)
                 empty_families = []
 
                 for family in self.families:
