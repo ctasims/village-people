@@ -52,7 +52,7 @@ class Family:
         update stats.
         update output.
         get output and add to village stores, based on prof.
-        get required food and supplies.
+        get required food and goods.
         get house if family doesn't have its own.
         """
         self.update_stats()
@@ -71,15 +71,15 @@ class Family:
             self.nourishment = "poor"
             self.village.food = 0
 
-        # get supplies
-        if self.village.supplies >= self.req_supplies:
-            self.supplies = self.req_supplies
+        # get goods
+        if self.village.goods >= self.req_goods:
+            self.goods = self.req_goods
             self.preparedness = "good"
-            self.village.supplies -= self.req_supplies
-        else:  # not enough supplies for max output
-            self.supplies = self.village.supplies
+            self.village.goods -= self.req_goods
+        else:  # not enough goods for max output
+            self.goods = self.village.goods
             self.preparedness = "poor"
-            self.village.supplies = 0
+            self.village.goods = 0
 
         # villager update
         # Also handle deaths
@@ -115,7 +115,7 @@ class Family:
         if self.profession == 'farmer':
             self.village.food += output
         elif self.profession == 'crafter':
-            self.village.supplies += output
+            self.village.goods += output
 
         self.print_status()
         return True
@@ -128,7 +128,7 @@ class Family:
         """
         members = self.get_members()  # update members
         self.req_food = sum([vill.req_food for vill in members])
-        self.req_supplies = sum([vill.req_supplies for vill in members])
+        self.req_goods = sum([vill.req_goods for vill in members])
         # update max_output based on # parents
         self.max_output = 0
         if self.dad:
@@ -199,7 +199,7 @@ class Family:
     def get_house(self):
         """
         When family is living with parents of dad, try to get a diff house.
-        This requires subtracting supplies from village.
+        This requires subtracting goods from village.
         """
         # first see if there is empty house
         if self.village.empty_houses:
@@ -208,10 +208,10 @@ class Family:
             print "{0} found an empty house!".format(self)
             return
 
-        available_supplies = self.village.supplies
-        if available_supplies >= 100:
+        available_goods = self.village.goods
+        if available_goods >= 100:
             self.house = House()
-            self.village.supplies -= 100
+            self.village.goods -= 100
             self.living_with_parents = False
         else:
             print "{0} can't get new house!".format(self)
@@ -226,15 +226,15 @@ class Family:
         	food = self.output
         	craft = "-"
 
-        print "{0}:\t hp {1} \t {2} \t {3}".format(self, self.compute_hp(),
-                food, craft)
+        print "%-10.10s hp: %6d %6s %6s" % (self, self.compute_hp(), food,
+                craft)
 
 
     def update_output(self):
         """
         Output is affected by house, health of villagers.
         Update output every month.
-        With no supplies, family will last for 1 year.
+        With no goods, family will last for 1 year.
         """
         max_o = self.max_output
         if max_o == 0:

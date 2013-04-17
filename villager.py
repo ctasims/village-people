@@ -14,7 +14,7 @@ class Villager:
     age_hp = [20, 100, 100, -100, -400]
     num_villagers = 0
     req_food = 30
-    req_supplies = 30
+    req_goods = 30
     genders = ['f', 'm']
     next_gender = 1
     professions = ['farmer', 'crafter', 'guard']
@@ -60,8 +60,8 @@ class Villager:
         self.hp = self.__class__.birth_hp
         # req_food only changes at adulthood
         self.req_food = self.__class__.req_food / 2
-        # req supplies never changes
-        self.req_supples = self.__class__.req_supplies
+        # req goods never changes
+        self.req_supples = self.__class__.req_goods
         self.nourishment = 3
 
         # on startup, create family-less villagers
@@ -95,8 +95,10 @@ class Villager:
         self.hp = 0 if self.hp < 0 else self.hp
         return self.hp
 
-    def have_birthday(self):
+    def have_birthday(self, profession=None):
         """ every year, advance villager's age and refresh stats
+        Can set profession manually. Only applies once they grow up.
+        Yes, it's a hack...
         """
         self.age += 1
         # update age group and label
@@ -108,7 +110,7 @@ class Villager:
             else:
                 pass
         if self.age == 16:
-            self.grow_up()
+            self.grow_up(profession)
         # adjust hp
         self.update_hp(self.__class__.age_hp[self.age_group])
         # adult only stuff
@@ -128,15 +130,16 @@ class Villager:
         """
         print "{0} HAS DIED!".format(self)
 
-    def grow_up(self):
+    def grow_up(self, profession=None):
         """ upon reaching adulthood males start family and look for mate.
         females go onto Prospects list.
+        can set profession manually.
         """
         self.req_food = self.__class__.req_food
         # get profession
 
         if self.gender == 'm':
-            self.profession = self.village.new_profession(self)
+            self.profession = self.village.new_profession(self, profession)
             if self.family:
                 dad_house = self.family.house
             else:
@@ -186,12 +189,12 @@ class Villager:
         return self
 
 
-    def force_grow_up(self):
+    def force_grow_up(self, profession=None):
         """ Advances villager to adulthood.
         Used when populating village for first time with villagers.
         """
         while self.age is not 16:
-        	self.have_birthday()
+        	self.have_birthday(profession)
         return self
 
 

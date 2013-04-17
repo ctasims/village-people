@@ -4,7 +4,7 @@ from villager import Villager
 from house import House
 
 
-def create_initial_populace(village, num_families):
+def create_initial_populace(village, num_families, professions):
     """
     Create men and women; they'll be children.
     Create families for each. THEN force grow them up.
@@ -16,9 +16,9 @@ def create_initial_populace(village, num_families):
     for indx in range(num_families):
         new_woman = Villager(village, None, 'f')
         new_woman.force_grow_up()
-    for indx in range(num_families):
+    for indx, prof in zip(range(num_families), professions):
         new_man = Villager(village, None, 'm')
-        new_man.force_grow_up()
+        new_man.force_grow_up(prof)
 
     # They should all be married now
     # professions are random
@@ -47,14 +47,18 @@ if __name__ == "__main__":
     """
     vill = Village()
     vill.food = 1000
-    vill.supplies = 1000
+    vill.goods = 1000
     # create 10 empty houses
     houses = [House() for x in range(10)]
     vill.empty_houses = houses
     # create families
-    num_families = 1
+    c = 'crafter'
+    f = 'farmer'
+    g = 'guard'
+    num_families = 2
+    professions = [f, c]
     print "\n\n"
-    create_initial_populace(vill, num_families)
+    create_initial_populace(vill, num_families, professions)
 
     # start sim!
     years = 4

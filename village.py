@@ -5,7 +5,7 @@ class Village:
     num_villagers = 0
 
     def __init__(self):
-        self.supplies = 1000
+        self.goods = 1000
         self.food = 1000
 
         self.villagers = []
@@ -31,7 +31,7 @@ class Village:
     def run_village(self, years):
         for year in range(years):
             print "\n\n====== YEAR {0} ======".format(year)
-            print "food: {0}, supplies {1}".format(self.food, self.supplies)
+            print "food: {0}, goods {1}".format(self.food, self.goods)
             print "{0} families".format(len(self.families))
             for month in range(10):
             	print "\n-- MONTH {0} --".format(month)
@@ -47,7 +47,7 @@ class Village:
                 	self.families.remove(empty_fam)
                 self.families = filter(None, self.families)
 
-                print "VILLAGE: {0}/{1}".format(self.food, self.supplies)
+                print "VILLAGE: {0}/{1}".format(self.food, self.goods)
             #import pdb; pdb.set_trace()
 
             # annual update for each family
@@ -55,7 +55,7 @@ class Village:
                 family.yearly_update()
 
 
-    def new_profession(self, villager):
+    def new_profession(self, villager, profession=None):
         """ roll for new profession and assign villager to it.
         Profession rates are stored as percentage, where range of all 3 is 100.
         e.g. farmer = 30, crafter = 60, guard = 99
@@ -64,18 +64,28 @@ class Village:
         [31, 60] == crafter
         [61, 99] == guard
         """
-        random.seed()
-        rate = random.random()
-        if rate <= self.farmer_rate:
-        	self.farmers.append(villager)
-        	return 'farmer'
-        elif rate <= self.crafter_rate:
-        	self.crafters.append(villager)
-        	return 'crafter'
+        if profession:
+        	# set profession manually
+            if profession == 'farmer':
+                self.farmers.append(villager)
+            elif profession == 'crafter':
+                self.crafters.append(villager)
+            else:
+                raise Exception("ERROR: Bad profession given.")
+            return profession
         else:
-        	raise Exception("No prof!")
-            #self.guards.append(villager)
-            #return 'guard'
+            random.seed()
+            rate = random.random()
+            if rate <= self.farmer_rate:
+                self.farmers.append(villager)
+                return 'farmer'
+            elif rate <= self.crafter_rate:
+                self.crafters.append(villager)
+                return 'crafter'
+            else:
+                raise Exception("No prof!")
+                #self.guards.append(villager)
+                #return 'guard'
 
     def update_profession(self, villager):
         """ every year, adult villagers 

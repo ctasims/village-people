@@ -54,7 +54,7 @@ class TestVillager(unittest.TestCase):
         self.assertEqual(self.dad.nourishment, 3)
         self.assertEqual(self.dad.age_label, 'prime')
         self.assertEqual(self.dad.req_food, 30)
-        # villager will have house built from village supplies
+        # villager will have house built from village goods
         self.assertFalse(self.dad.family.house == None)
 
     def test_grow_to_middle_age(self):
@@ -144,7 +144,7 @@ class TestFamily(unittest.TestCase):
         self.dad.family.update_stats()
         self.assertEqual(self.dad.family.size, 2)
         self.assertEqual(self.dad.family.req_food, 60)
-        self.assertEqual(self.dad.family.req_supplies, 80)
+        self.assertEqual(self.dad.family.req_goods, 80)
         self.assertEqual(self.dad.family.size, 2)
 
     def test_compute_hp(self):
