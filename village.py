@@ -15,12 +15,10 @@ class Village:
         # profs
         self.farmers = []
         self.crafters = []
-        #self.guards = []
-        self.farmer_rate = 0.50
-        self.crafter_rate = 1.0
-        #self.farmer_rate = 0.33
-        #self.crafter_rate = 0.66
-        #self.guard_rate = 0.99
+        self.guards = []
+        self.farmer_rate = 0.40
+        self.crafter_rate = 0.80
+        self.guard_rate = 1.00
         self.new_prof_rate = 0.10
 
         # houses
@@ -46,7 +44,7 @@ class Village:
                     fam_status = family.monthly_update()
                     #import pdb; pdb.set_trace()
 
-                print "VILLAGE: {0}/{1}".format(self.food, self.goods)
+                print "VILLAGE: {0}/{1}\n".format(self.food, self.goods)
             #import pdb; pdb.set_trace()
 
             # annual update for each family
@@ -69,6 +67,8 @@ class Village:
                 self.farmers.append(villager)
             elif profession == 'crafter':
                 self.crafters.append(villager)
+            elif profession == 'guard':
+                self.guards.append(villager)
             else:
                 raise Exception("ERROR: Bad profession given.")
             return profession
@@ -82,9 +82,8 @@ class Village:
                 self.crafters.append(villager)
                 return 'crafter'
             else:
-                raise Exception("No prof!")
-                #self.guards.append(villager)
-                #return 'guard'
+                self.guards.append(villager)
+                return 'guard'
 
     def update_profession(self, villager):
         """ every year, adult villagers 

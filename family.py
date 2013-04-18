@@ -14,7 +14,7 @@ class Family:
     -- if family living with dad's parents
     -- health of family members
     """
-    max_solo_outputs = {'farmer': 60, 'crafter': 20}
+    max_solo_outputs = {'farmer': 60, 'crafter': 20, 'guard': 0}
 
     def __init__(self, village, house, dad, profession=None):
         # dad is only None on startup, for initial families
@@ -50,16 +50,19 @@ class Family:
 
 
     def __repr__(self):
-        return "{0}".format(self.dad)
+        return "{0} ({1})".format(self.dad, self.size)
 
     def print_status(self):
         if self.profession == 'crafter':
         	food = "-"
         	craft = self.output
-        else:
+        elif self.profession == 'farmer':
         	food = self.output
         	craft = "-"
-        print "%-10.10s hp: %6d %6s %6s" % (self, self.compute_hp(), food,craft)
+        else:  # guard
+        	food = "-"
+        	craft = "g"
+        print "%-14.14s hp: %6d %6s %6s" % (self, self.compute_hp(), food,craft)
 
 
     def yearly_update(self):
@@ -87,21 +90,21 @@ class Family:
 
         # get food
         if self.village.food >= self.req_food:
-            self.food = self.req_food
+            #self.food = self.req_food
             self.nourishment = "good"
             self.village.food -= self.req_food
         else:  # not enough food to be well-fed
-            self.food = self.village.food
+            #self.food = self.village.food
             self.nourishment = "poor"
             self.village.food = 0
 
         # get goods
         if self.village.goods >= self.req_goods:
-            self.goods = self.req_goods
+            #self.goods = self.req_goods
             self.preparedness = "good"
             self.village.goods -= self.req_goods
         else:  # not enough goods for max output
-            self.goods = self.village.goods
+            #self.goods = self.village.goods
             self.preparedness = "poor"
             self.village.goods = 0
 
@@ -156,6 +159,8 @@ class Family:
             self.village.food += output
         elif self.profession == 'crafter':
             self.village.goods += output
+        elif self.profession == 'guard':
+            pass
 
         self.print_status()
         return True
@@ -273,20 +278,22 @@ class Family:
         Update output every month.
         With no goods, family will last for 1 year.
         """
+        if self.profession == 'guard':
+        	return 0
         max_o = self.max_output
         max_solo = self.max_solo_output
         if max_o == 0:
             print "No family members!"
             return
 
-        fam_size = len(self.members)
+        fam_size = self.size
         max_fam_hp = fam_size * 1000
         curr_fam_hp = float(self.compute_hp())
         hp_ratio = curr_fam_hp / max_fam_hp
 
         # living at home means lower productivity
         if self.living_with_parents:
-            self.output -= max_solo * 0.20
+            self.output -= max_solo * 0.05
         else:
         	pass
 
@@ -313,5 +320,5 @@ class Family:
         self.output = max_o if self.output > max_o else self.output
         self.output = 0 if self.output < 0 else self.output
 
-        return self.output
+        return round(self.output)
 
