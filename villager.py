@@ -10,7 +10,7 @@ class Villager:
     """
     birth_hp = 150
     age_labels = ['infant', 'child', 'prime', 'middle', 'old']
-    adulthood = 20
+    adulthood = 15
     age_groups = [[0, 5], [6, adulthood-1], [adulthood, 40], [41, 60], [61, 200]]
     age_hp = [5, 10, 50, -100, -400]
     num_villagers = 0
@@ -133,7 +133,7 @@ class Villager:
             elif self.profession == 'crafter':
             	self.village.crafters.remove(self)
             else:
-                raise Exception("ERROR: no profession!")
+            	self.village.guards.remove(self)
         print "{0} HAS DIED!".format(self)
 
 

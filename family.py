@@ -14,8 +14,8 @@ class Family:
     -- if family living with dad's parents
     -- health of family members
     """
-    max_solo_outputs = {'farmer': 60, 'crafter': 20, 'guard': 0}
-    max_fam_outputs = {'farmer': 200, 'crafter': 70, 'guard': 0}
+    max_solo_outputs = {'farmer': 60, 'crafter': 30, 'guard': 0}
+    max_fam_outputs = {'farmer': 200, 'crafter': 90, 'guard': 0}
 
     def __init__(self, village, house, dad, profession=None):
         # dad is only None on startup, for initial families
@@ -27,6 +27,7 @@ class Family:
         self.output = None  # depends on profession
         self.mom = None
         self.dad = dad
+        #self.chance_of_baby = self.village.baby_rate
         self.nourishment = "good"
         self.kids = []
 
@@ -73,7 +74,7 @@ class Family:
             self.mom.birthday()
         for kid in self.kids:
         	kid.birthday()
-        self.check_for_baby(0.25)
+        self.check_for_baby(self.village.baby_rate)
 
 
     def monthly_update(self):
@@ -282,9 +283,6 @@ class Family:
         if self.profession == 'guard':
         	return 0
         max_o = self.max_output
-        # family can only produce so much. We'll cap max output
-        if self.max_output > self.max_fam_outputs[self.profession]:
-        	max_o = self.max_fam_outputs[self.profession]
 
         max_solo = self.max_solo_output
         if max_o == 0:
@@ -324,6 +322,11 @@ class Family:
         # adjust for going over max or below min
         self.output = max_o if self.output > max_o else self.output
         self.output = 0 if self.output < 0 else self.output
+
+        # family can only produce so much. We'll cap max output
+        max_fam_output = self.max_fam_outputs[self.profession]
+        if self.output > max_fam_output:
+            self.output = max_fam_output
 
         return round(self.output)
 

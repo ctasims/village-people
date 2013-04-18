@@ -55,7 +55,7 @@ if __name__ == "__main__":
     c = 'crafter'
     f = 'farmer'
     g = 'guard'
-    num_families = 2
+    num_families = 5
     professions = [f, c]
     print "\n\n"
     create_initial_populace(vill, num_families, professions)

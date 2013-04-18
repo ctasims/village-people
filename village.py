@@ -7,6 +7,7 @@ class Village:
     def __init__(self):
         self.goods = 1000
         self.food = 1000
+        self.year = 0
 
         self.villagers = []
         self.prospects = []  # list available mates
@@ -16,10 +17,13 @@ class Village:
         self.farmers = []
         self.crafters = []
         self.guards = []
+        #self.new_prof_rate = 0.10
+
+        # GA controls
         self.farmer_rate = 0.40
         self.crafter_rate = 0.80
         self.guard_rate = 1.00
-        self.new_prof_rate = 0.10
+        self.baby_rate = 0.15
 
         # houses
         self.houses = []
@@ -28,10 +32,11 @@ class Village:
 
     def run_village(self, years):
         for year in range(years):
+        	self.year = year
         	# End simulation if everyone's dead
             if self.families == []:
-                print "ALL GONE YOU FAIL"
-                break
+                print "THE VILLAGE PEOPLE DIED IN YEAR {0}".format(year)
+                return year
 
             print "\n\n====== YEAR {0} ======".format(year)
             print "food: {0}, goods {1}".format(self.food, self.goods)
@@ -52,7 +57,6 @@ class Village:
             # every other year, 10% of food spoils
             if year % 2 == 0:
             	self.food = round( self.food * 0.9)
-
 
     def new_profession(self, villager, profession=None):
         """ roll for new profession and assign villager to it.
@@ -91,4 +95,18 @@ class Village:
         """ every year, adult villagers 
         """
         pass
+
+    ########################
+    #### GA FUNCTIONS #####
+
+    def get_fitness(self):
+        return self.year
+
+    def mutate(self):
+        self.farmer_rate = random.uniform(0, 1)
+        self.crafter_rate = random.uniform(self.farmer_rate, 1)
+        self.baby_rate = random.uniform(0,1)
+
+    def ga(self):
+
 
