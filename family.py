@@ -15,6 +15,7 @@ class Family:
     -- health of family members
     """
     max_solo_outputs = {'farmer': 60, 'crafter': 20, 'guard': 0}
+    max_fam_outputs = {'farmer': 200, 'crafter': 70, 'guard': 0}
 
     def __init__(self, village, house, dad, profession=None):
         # dad is only None on startup, for initial families
@@ -281,6 +282,10 @@ class Family:
         if self.profession == 'guard':
         	return 0
         max_o = self.max_output
+        # family can only produce so much, so cap max output
+        if self.max_output > self.max_fam_outputs[self.profession]:
+        	max_o = self.max_fam_outputs[self.profession]
+
         max_solo = self.max_solo_output
         if max_o == 0:
             print "No family members!"
