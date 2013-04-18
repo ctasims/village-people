@@ -1,4 +1,6 @@
 import random
+from house import House
+from villager import Villager
 
 
 class Village:
@@ -28,28 +30,50 @@ class Village:
 
         # houses
         self.houses = []
-        self.empty_houses = []
+        # create 10 empty houses
+        self.empty_houses = [House() for x in range(10)]
+
+        #c = 'crafter'
+        #f = 'farmer'
+        #g = 'guard'
+        num_families = 5
+        #professions = [f, c]
+
+        colonist_men = []
+        colonist_women = []
+        num_families = 10
+        for indx in range(num_families):
+            new_woman = Villager(self, None, 'f')
+            new_woman.force_grow_up()
+        #for indx, prof in zip(range(num_families), professions):
+        for indx in range(num_families):
+            new_man = Villager(self, None, 'm')
+            new_man.force_grow_up()
+
+        # start with 1 kid each
+        for family in self.families:
+            family.check_for_baby(1)
 
 
     def run_village(self, years):
         for year in range(years):
-        	self.year = year
-        	# End simulation if everyone's dead
+            self.year = year
             if self.families == []:
-                print "THE VILLAGE PEOPLE DIED IN YEAR {0}".format(year)
-                return year
+            	return year
+                #print "THE VILLAGE PEOPLE DIED IN YEAR {0}".format(year)
+                #return year
 
-            print "\n\n====== YEAR {0} ======".format(year)
-            print "food: {0}, goods {1}".format(self.food, self.goods)
-            print "{0} families, {1} villagers".format(len(self.families),
-                len(self.villagers))
+            #print "\n\n====== YEAR {0} ======".format(year)
+            #print "food: {0}, goods {1}".format(self.food, self.goods)
+            #print "{0} families, {1} villagers".format(len(self.families),
+                #len(self.villagers))
 
             # loop over each month
             for month in range(10):
                 for family in self.families:
                     fam_status = family.monthly_update()
 
-                print "VILLAGE: {0}/{1}\n".format(self.food, self.goods)
+                #print "VILLAGE: {0}/{1}\n".format(self.food, self.goods)
 
             # annual update for each family
             for family in self.families:
@@ -81,7 +105,7 @@ class Village:
             return profession
         else:
             random.seed()
-            rate = random.uniform()
+            rate = random.uniform(0, 1)
             if rate <= self.farmer_rate:
                 self.farmers.append(villager)
                 return 'farmer'

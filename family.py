@@ -64,7 +64,7 @@ class Family:
         else:  # guard
         	food = "-"
         	craft = "g"
-        print "%-14.14s hp: %6d %6s %6s" % (self, self.compute_hp(), food,craft)
+        #print "%-14.14s hp: %6d %6s %6s" % (self, self.compute_hp(), food,craft)
 
 
     def yearly_update(self):
@@ -244,10 +244,11 @@ class Family:
                 baby = self.mom.give_birth()
                 self.kids.append(baby)
                 self.update_stats()
-                print "{0} HAD A BABY!!".format(self)
+                #print "{0} HAD A BABY!!".format(self)
                 return baby
             else:
-                print "family %s can't have kids - no mom!" % self
+            	pass
+                #print "family %s can't have kids - no mom!" % self
         else:
         	pass
 
@@ -261,7 +262,7 @@ class Family:
         if self.village.empty_houses:
             self.house = self.village.empty_houses.pop()
             self.living_with_parents = False
-            print "{0} found an empty house!".format(self)
+            #print "{0} found an empty house!".format(self)
             return
 
         available_goods = self.village.goods
@@ -270,7 +271,8 @@ class Family:
             self.village.goods -= 100
             self.living_with_parents = False
         else:
-            print "{0} can't get new house!".format(self)
+        	pass
+            #print "{0} can't get new house!".format(self)
         return
 
 
@@ -286,7 +288,7 @@ class Family:
 
         max_solo = self.max_solo_output
         if max_o == 0:
-            print "No family members!"
+            #print "No family members!"
             return
 
         fam_size = self.size

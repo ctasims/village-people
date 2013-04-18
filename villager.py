@@ -134,7 +134,7 @@ class Villager:
             	self.village.crafters.remove(self)
             else:
             	self.village.guards.remove(self)
-        print "{0} HAS DIED!".format(self)
+        #print "{0} HAS DIED!".format(self)
 
 
     def grow_up(self, profession=None):
@@ -154,7 +154,7 @@ class Villager:
                 dad_house = None
             self.family = Family(self.village, dad_house, dad=self)
             self.village.families.append(self.family)
-            print "\n{0} becomes a {1}".format(self, self.profession)
+            #print "\n{0} becomes a {1}".format(self, self.profession)
         elif self.gender == 'f':
             if self.family:
                 self.family.kids.remove(self)
@@ -199,10 +199,10 @@ class Villager:
                 bride.spouse = self
                 self.spouse = bride
                 self.family.add_mom(self.spouse)
-                print "\n%s married %s!" % (self, self.spouse)
+                #print "\n%s married %s!" % (self, self.spouse)
             else:
                 pass
-                print "\n%s found no prospects" % self
+                #print "\n%s found no prospects" % self
         return self
 
 

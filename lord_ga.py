@@ -1,4 +1,5 @@
 import random
+from village import Village
 
 class Lord_GA:
 
@@ -6,27 +7,49 @@ class Lord_GA:
         """
         Initialize first batch of values
         """
-        self.P = []
+        self.init_P = []
         for x in range(10):
-        	self.P.append(self.random_vals())
+        	self.init_P.append(self.random_vals())
 
 
-    def run(self, max_fitness=1000, num_villages=100):
+    def run(self, max_runs=10, max_fitness=1000, num_villages=100):
         """
         GA repeatedly creates a village, runs it with values, then judges its
         performance and modifies values.
         Runs in groups of 10 villages.
         """
-        pass
+        max_years = 40
+        run = 1
+        total_results = []
+        P = self.init_P
+        while run <= max_runs:
+            results = []
+            for rates in P:
+                vill = Village(rates)
+                fitness = vill.run_village(max_years)
+                results.append((fitness, rates))
+            total_results.append(results)
+
+            # now modify rates
+            P = self.mutate(P)
+            P = self.one_point_crossover(P)
+
+            run += 1
+
+        return total_results
+
 
 
     def random_vals(self):
-        f_rate = random.uniform(0, 1)
-        c_rate = random.uniform(0, 1)
-        g_rate = random.uniform(0, 1)
-        baby_rate = random.uniform(0,1)
+        f_rate = round(random.uniform(0, 1), 2)
+        c_rate = round(random.uniform(0, 1), 2)
+        g_rate = round(random.uniform(0, 1), 2)
+        baby_rate = round(random.uniform(0,1), 2)
         return [f_rate, c_rate, g_rate, baby_rate]
 
+
+    def tournament_select(self, P, results):
+        pass
 
     def mutate(self, P):
         """
@@ -34,7 +57,7 @@ class Lord_GA:
         rates
         """
         # first grab random rows from P
-        rows = random.sample(P, random.uniform(1, len(P))) 
+        rows = random.sample(P, random.randint(1, len(P))) 
         for row in rows:
         	row = self.random_vals()
         return P
@@ -49,10 +72,12 @@ class Lord_GA:
 
         # now grab pair of random rows and crossover. Repeat until no more.
         new_P = []
-        while P:
-        	row_a = P.pop(indexes.pop())
-        	row_b = P.pop(indexes.pop())
-        	a_vals = [a[2], a[3]]
+        for pair in range(len(P)/2):
+        	index_a = indexes.pop()
+        	index_b = indexes.pop()
+        	row_a = P[index_a]
+        	row_b = P[index_b]
+        	a_vals = [row_a[2], row_a[3]]
         	row_a[2] = row_b[2]
         	row_a[3] = row_b[3]
         	row_b[2] = a_vals[0]
@@ -61,4 +86,13 @@ class Lord_GA:
         	new_P.append(row_b)
 
         return new_P
+
+
+if __name__ == "__main__":
+    ga = Lord_GA()
+    total_results = ga.run()
+    for results in total_results:
+        for result in results:
+            print result
+        print "\n"
 
