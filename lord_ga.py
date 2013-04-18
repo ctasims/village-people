@@ -22,8 +22,8 @@ class Lord_GA:
 
     def random_vals(self):
         f_rate = random.uniform(0, 1)
-        c_rate = random.uniform(f_rate, 1)
-        g_rate = 1
+        c_rate = random.uniform(0, 1)
+        g_rate = random.uniform(0, 1)
         baby_rate = random.uniform(0,1)
         return [f_rate, c_rate, g_rate, baby_rate]
 

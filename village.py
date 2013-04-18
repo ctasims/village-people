@@ -4,7 +4,7 @@ import random
 class Village:
     num_villagers = 0
 
-    def __init__(self):
+    def __init__(self, rates):
         self.goods = 1000
         self.food = 1000
         self.year = 0
@@ -20,10 +20,11 @@ class Village:
         #self.new_prof_rate = 0.10
 
         # GA controls
-        self.farmer_rate = 0.40
-        self.crafter_rate = 0.80
-        self.guard_rate = 1.00
-        self.baby_rate = 0.15
+        rate_total = sum(rates[:3])
+        self.farmer_rate = rates[0] / rate_total
+        self.crafter_rate = rates[1] / rate_total
+        self.guard_rate = rates[2] / rate_total
+        self.baby_rate = rates[3]
 
         # houses
         self.houses = []
@@ -80,14 +81,14 @@ class Village:
             return profession
         else:
             random.seed()
-            rate = random.random()
+            rate = random.uniform()
             if rate <= self.farmer_rate:
                 self.farmers.append(villager)
                 return 'farmer'
-            elif rate <= self.crafter_rate:
+            elif rate <= self.farmer_rate + self.crafter_rate:
                 self.crafters.append(villager)
                 return 'crafter'
-            else:
+            elif rate <= self.farmer_rate + self.crafter_rate + self.guard_rate:
                 self.guards.append(villager)
                 return 'guard'
 
@@ -95,18 +96,4 @@ class Village:
         """ every year, adult villagers 
         """
         pass
-
-    ########################
-    #### GA FUNCTIONS #####
-
-    def get_fitness(self):
-        return self.year
-
-    def mutate(self):
-        self.farmer_rate = random.uniform(0, 1)
-        self.crafter_rate = random.uniform(self.farmer_rate, 1)
-        self.baby_rate = random.uniform(0,1)
-
-    def ga(self):
-
 
