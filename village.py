@@ -49,7 +49,7 @@ class Village:
             for family in self.families:
                 family.yearly_update()
 
-            # every other year, 10% food spoils
+            # every other year, 10% of food spoils
             if year % 2 == 0:
             	self.food -= self.food * 0.1
 
