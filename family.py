@@ -282,7 +282,7 @@ class Family:
         if self.profession == 'guard':
         	return 0
         max_o = self.max_output
-        # family can only produce so much, so cap max output
+        # family can only produce so much. We'll cap max output
         if self.max_output > self.max_fam_outputs[self.profession]:
         	max_o = self.max_fam_outputs[self.profession]
 
