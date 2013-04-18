@@ -10,8 +10,9 @@ class Villager:
     """
     birth_hp = 150
     age_labels = ['infant', 'child', 'prime', 'middle', 'old']
-    age_groups = [[0, 5], [6, 15], [16, 40], [41, 60], [61, 200]]
-    age_hp = [20, 100, 100, -100, -400]
+    adulthood = 20
+    age_groups = [[0, 5], [6, adulthood-1], [adulthood, 40], [41, 60], [61, 200]]
+    age_hp = [5, 10, 50, -100, -400]
     num_villagers = 0
     req_food = 30
     req_goods = 10
@@ -77,7 +78,7 @@ class Villager:
         Without food, family will last 2-3 months before dying.
         """
         if self.family.nourishment is "good":
-        	self.update_hp(20)
+        	self.update_hp(self.age_hp[self.age_group])
         else:
         	self.update_hp(-300)
 
@@ -108,9 +109,9 @@ class Villager:
                 break
             else:
                 pass
-        if self.age == 16:
+        if self.age == self.adulthood:
             self.grow_up(profession)
-        elif self.age > 16:
+        elif self.age > self.adulthood:
         # adult only stuff
             # TODO: update prof sometimes?
             #self.profession = self.village.update_profession(self)
@@ -126,7 +127,7 @@ class Villager:
         If male, remove from prof list
         """
         self.village.villagers.remove(self)
-        if self.gender == 'm' and self.age >= 16:
+        if self.gender == 'm' and self.age >= self.adulthood:
             if self.profession == 'farmer':
             	self.village.farmers.remove(self)
             elif self.profession == 'crafter':
@@ -209,7 +210,7 @@ class Villager:
         """ Advances villager to adulthood.
         Used when populating village for first time with villagers.
         """
-        while self.age is not 16:
+        while self.age is not self.adulthood:
         	self.birthday(profession)
         self.hp = 1000
         return self

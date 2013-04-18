@@ -51,7 +51,7 @@ class Village:
 
             # every other year, 10% of food spoils
             if year % 2 == 0:
-            	self.food -= self.food * 0.1
+            	self.food = round( self.food * 0.9)
 
 
     def new_profession(self, villager, profession=None):
