@@ -28,28 +28,30 @@ class Village:
 
     def run_village(self, years):
         for year in range(years):
+        	# End simulation if everyone's dead
             if self.families == []:
                 print "ALL GONE YOU FAIL"
                 break
-            #if year == 16:
-                #import pdb
-                #pdb.set_trace()
+
             print "\n\n====== YEAR {0} ======".format(year)
             print "food: {0}, goods {1}".format(self.food, self.goods)
             print "{0} families, {1} villagers".format(len(self.families),
                 len(self.villagers))
+
+            # loop over each month
             for month in range(10):
-                #print "\n-- MONTH {0} --".format(month)
                 for family in self.families:
                     fam_status = family.monthly_update()
-                    #import pdb; pdb.set_trace()
 
                 print "VILLAGE: {0}/{1}\n".format(self.food, self.goods)
-            #import pdb; pdb.set_trace()
 
             # annual update for each family
             for family in self.families:
                 family.yearly_update()
+
+            # every other year, 10% food spoils
+            if year % 2 == 0:
+            	self.food -= self.food * 0.1
 
 
     def new_profession(self, villager, profession=None):
