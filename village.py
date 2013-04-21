@@ -1,12 +1,13 @@
 import random
 from house import House
 from villager import Villager
+import sys
 
 
 class Village:
-    num_villagers = 0
 
     def __init__(self, rates):
+        self.num_villagers = 0
         self.goods = 1000
         self.food = 1000
         self.year = 0
@@ -14,6 +15,8 @@ class Village:
         self.villagers = []
         self.prospects = []  # list available mates
         self.families = []
+        self.max_solo_outputs = {'farmer': 60, 'crafter': 30, 'guard': 0}
+        self.max_fam_outputs = {'farmer': 200, 'crafter': 90, 'guard': 0}
 
         # profs
         self.farmers = []
@@ -33,11 +36,10 @@ class Village:
         # create 10 empty houses
         self.empty_houses = [House() for x in range(10)]
 
-        #c = 'crafter'
-        #f = 'farmer'
-        #g = 'guard'
-        num_families = 5
-        #professions = [f, c]
+        c = 'crafter'
+        f = 'farmer'
+        g = 'guard'
+        professions = [f, c, f, c, f, c, f, c, g, g]
 
         colonist_men = []
         colonist_women = []
@@ -48,7 +50,7 @@ class Village:
         #for indx, prof in zip(range(num_families), professions):
         for indx in range(num_families):
             new_man = Villager(self, None, 'm')
-            new_man.force_grow_up()
+            new_man.force_grow_up(profession=professions[indx])
 
         # start with 1 kid each
         for family in self.families:
@@ -59,9 +61,8 @@ class Village:
         for year in range(years):
             self.year = year
             if self.families == []:
-            	return year
                 #print "THE VILLAGE PEOPLE DIED IN YEAR {0}".format(year)
-                #return year
+                return year
 
             #print "\n\n====== YEAR {0} ======".format(year)
             #print "food: {0}, goods {1}".format(self.food, self.goods)
@@ -81,7 +82,8 @@ class Village:
 
             # every other year, 10% of food spoils
             if year % 2 == 0:
-            	self.food = round( self.food * 0.9)
+                self.food = round( self.food * 0.9)
+            
 
     def new_profession(self, villager, profession=None):
         """ roll for new profession and assign villager to it.
@@ -104,7 +106,7 @@ class Village:
                 raise Exception("ERROR: Bad profession given.")
             return profession
         else:
-            random.seed()
+            #random.seed()
             rate = random.uniform(0, 1)
             if rate <= self.farmer_rate:
                 self.farmers.append(villager)
@@ -115,9 +117,26 @@ class Village:
             elif rate <= self.farmer_rate + self.crafter_rate + self.guard_rate:
                 self.guards.append(villager)
                 return 'guard'
+            else:
+                raise Exception("ERROR: new profession")
 
     def update_profession(self, villager):
         """ every year, adult villagers 
         """
         pass
+
+
+if __name__ == "__main__":
+    rates = [0.2, 0.6, 0, 0.1]
+    #random.seed(0.08)
+    #vill = Village(rates)
+    #fitness = vill.run_village(100)
+    #print fitness
+    for x in range(10):
+        #seed = x / 1530.0
+        #random.seed(seed)
+        vill = Village(rates)
+        fitness = vill.run_village(300)
+        print fitness
+        vill = None
 

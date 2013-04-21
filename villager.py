@@ -13,7 +13,6 @@ class Villager:
     adulthood = 15
     age_groups = [[0, 5], [6, adulthood-1], [adulthood, 40], [41, 60], [61, 200]]
     age_hp = [5, 10, 50, -100, -400]
-    num_villagers = 0
     req_food = 30
     req_goods = 10
     genders = ['f', 'm']
@@ -40,8 +39,8 @@ class Villager:
         self.village.villagers.append(self)
         self.family = family
         self.spouse = None
-        self.__class__.num_villagers += 1
-        self.id = self.__class__.num_villagers
+        self.village.num_villagers += 1
+        self.id = self.village.num_villagers
         self.age_group = 0
         self.age_label = self.__class__.age_labels[self.age_group]
 

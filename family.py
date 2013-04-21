@@ -14,8 +14,6 @@ class Family:
     -- if family living with dad's parents
     -- health of family members
     """
-    max_solo_outputs = {'farmer': 60, 'crafter': 30, 'guard': 0}
-    max_fam_outputs = {'farmer': 200, 'crafter': 90, 'guard': 0}
 
     def __init__(self, village, house, dad, profession=None):
         # dad is only None on startup, for initial families
@@ -40,10 +38,10 @@ class Family:
         else:
             self.profession = self.dad.profession
             self.living_with_parents = True
-        self.output = self.__class__.max_solo_outputs[self.profession]
+        self.output = self.village.max_solo_outputs[self.profession]
         # increase output base amt
         prof = self.profession
-        self.__class__.max_solo_outputs[prof] = round(self.__class__.max_solo_outputs[prof] * 1.1)
+        self.village.max_solo_outputs[prof] = round(self.village.max_solo_outputs[prof] * 1.1)
 
 
         self.get_house()
@@ -68,13 +66,16 @@ class Family:
 
 
     def yearly_update(self):
-        if self.dad:
-            self.dad.birthday()
-        if self.mom:
-            self.mom.birthday()
-        for kid in self.kids:
-        	kid.birthday()
-        self.check_for_baby(self.village.baby_rate)
+        try:
+            if self.dad:
+                self.dad.birthday()
+            if self.mom:
+                self.mom.birthday()
+            for kid in self.kids:
+                kid.birthday()
+            self.check_for_baby(self.village.baby_rate)
+        except:
+            print 'yearly update'
 
 
     def monthly_update(self):
@@ -120,7 +121,7 @@ class Family:
             # dad died!
             self.dad = None
             prof = self.profession
-            self.__class__.max_solo_outputs[prof] = round(self.__class__.max_solo_outputs[prof] * 0.90)
+            self.village.max_solo_outputs[prof] = round(self.village.max_solo_outputs[prof] * 0.90)
             self.update_stats()
 
         if self.mom:
@@ -131,7 +132,7 @@ class Family:
             # mom died!
             self.mom = None
             prof = self.profession
-            self.__class__.max_solo_outputs[prof] = round(self.__class__.max_solo_outputs[prof] * 0.90)
+            self.village.max_solo_outputs[prof] = round(self.village.max_solo_outputs[prof] * 0.90)
             self.update_stats()
 
         removal_indexes = []  # if child dies, need this to later remove them
@@ -178,7 +179,7 @@ class Family:
         self.req_goods = sum([vill.req_goods for vill in members])
         # update max_output based on # parents
         self.max_output = 0
-        self.max_solo_output = self.__class__.max_solo_outputs[self.profession]
+        self.max_solo_output = self.village.max_solo_outputs[self.profession]
         if self.dad:
             self.max_output += self.max_solo_output
         if self.mom:
@@ -219,20 +220,9 @@ class Family:
         self.mom = villager
         self.output += self.max_solo_output
         prof = self.profession
-        self.__class__.max_solo_outputs[prof] = round(self.__class__.max_solo_outputs[prof] * 1.1)
+        self.village.max_solo_outputs[prof] = round(self.village.max_solo_outputs[prof] * 1.1)
         self.update_stats()
         return self
-
-
-    #def parent_died(self, gender):
-        #if gender is 'f':
-            ## mom passed away :(
-            #self.mom = None
-            #pass
-        #elif gender is 'm':
-            ## dad passed away :(
-            #self.dad = None
-            #self.update_stats()
 
 
     def check_for_baby(self, chance):
@@ -326,7 +316,7 @@ class Family:
         self.output = 0 if self.output < 0 else self.output
 
         # family can only produce so much. We'll cap max output
-        max_fam_output = self.max_fam_outputs[self.profession]
+        max_fam_output = self.village.max_fam_outputs[self.profession]
         if self.output > max_fam_output:
             self.output = max_fam_output
 
