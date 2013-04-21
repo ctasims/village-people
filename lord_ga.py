@@ -150,7 +150,6 @@ class Lord_GA:
 if __name__ == "__main__":
     ga = Lord_GA()
     total_results = ga.run()
-    #total_results = ga.run_once()
     for results in total_results:
         for result in results:
             print result
