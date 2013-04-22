@@ -168,10 +168,19 @@ if __name__ == "__main__":
     import time
     import csv
     import os
-    villages_per_run = 100
-    num_families = 10
-    max_runs = 200
-    max_fitness = 1000
+    # short analysis
+    long_analysis = False
+    if not long_analysis:
+        villages_per_run = 2
+        num_families = 10
+        max_runs = 2
+        max_fitness = 1000
+    else:
+        # long analysis
+        villages_per_run = 100
+        num_families = 10
+        max_runs = 200
+        max_fitness = 1000
     elitism = False
     ga = Lord_GA(villages_per_run)
     total_results = ga.run(num_families, max_runs, max_fitness, elitism)

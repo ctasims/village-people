@@ -15,13 +15,18 @@ class Village:
         self.villagers = []
         self.prospects = []  # list available mates
         self.families = []
-        self.max_solo_outputs = {'farmer': 60, 'crafter': 30, 'guard': 0}
-        self.max_fam_outputs = {'farmer': 200, 'crafter': 90, 'guard': 0}
+        self.max_solo_outputs = {'farmer': 80, 'crafter': 30, 'guard': 0}
+        self.max_fam_outputs = {'farmer': 240, 'crafter': 90, 'guard': 0}
 
         # profs
-        self.farmers = []
-        self.crafters = []
-        self.guards = []
+        #self.farmers = []
+        #self.crafters = []
+        #self.guards = []
+        self.prof_list = {
+                'farmer': [],
+                'crafter': [],
+                'guard': [],
+                }
         #self.new_prof_rate = 0.10
 
         # GA controls
@@ -29,7 +34,8 @@ class Village:
         self.farmer_rate = rates[0] / rate_total
         self.crafter_rate = rates[1] / rate_total
         self.guard_rate = rates[2] / rate_total
-        self.baby_rate = rates[3]
+        #self.baby_rate = rates[3]
+        self.baby_rate = 0.15
 
         # houses
         self.houses = []
@@ -39,7 +45,7 @@ class Village:
         c = 'crafter'
         f = 'farmer'
         g = 'guard'
-        professions = [f, c, f, c, f, c, f, c, g, g]
+        professions = [f, f, f, c, f, c, f, c, c, g]
 
         colonist_men = []
         colonist_women = []
@@ -62,12 +68,13 @@ class Village:
             self.year = year
             if self.families == []:
                 #print "THE VILLAGE PEOPLE DIED IN YEAR {0}".format(year)
+                print "food: {0}, goods {1}".format(self.food, self.goods)
                 return year
 
-            #print "\n\n====== YEAR {0} ======".format(year)
-            #print "food: {0}, goods {1}".format(self.food, self.goods)
-            #print "{0} families, {1} villagers".format(len(self.families),
-                #len(self.villagers))
+            print "\n\n====== YEAR {0} ======".format(year)
+            print "food: {0}, goods {1}".format(self.food, self.goods)
+            print "{0} families, {1} villagers".format(len(self.families),
+                len(self.villagers))
 
             # loop over each month
             for month in range(10):
@@ -96,33 +103,39 @@ class Village:
         """
         if profession:
         	# set profession manually
-            if profession == 'farmer':
-                self.farmers.append(villager)
-            elif profession == 'crafter':
-                self.crafters.append(villager)
-            elif profession == 'guard':
-                self.guards.append(villager)
-            else:
-                raise Exception("ERROR: Bad profession given.")
+            #if profession == 'farmer':
+                #self.farmers.append(villager)
+            #elif profession == 'crafter':
+                #self.crafters.append(villager)
+            #elif profession == 'guard':
+                #self.guards.append(villager)
+            #else:
+                #raise Exception("ERROR: Bad profession given.")
             return profession
         else:
             rate = random.random()
             if rate <= self.farmer_rate:
-                self.farmers.append(villager)
                 return 'farmer'
             elif rate <= self.farmer_rate + self.crafter_rate:
-                self.crafters.append(villager)
                 return 'crafter'
             elif rate <= self.farmer_rate + self.crafter_rate + self.guard_rate:
-                self.guards.append(villager)
                 return 'guard'
             else:
                 raise Exception("ERROR: new profession")
 
-    def update_profession(self, villager):
+    def update_profession(self, new_prof_rate=0.1):
         """ every year, adult villagers 
         """
-        pass
+        #if random.random() < new_prof_rate:
+        rate = random.random()
+        if rate <= self.farmer_rate:
+            return 'farmer'
+        elif rate <= self.farmer_rate + self.crafter_rate:
+            return 'crafter'
+        elif rate <= self.farmer_rate + self.crafter_rate + self.guard_rate:
+            return 'guard'
+        #else:
+            #return None
 
 
 if __name__ == "__main__":

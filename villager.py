@@ -126,13 +126,6 @@ class Villager:
         If male, remove from prof list
         """
         self.village.villagers.remove(self)
-        if self.gender == 'm' and self.age >= self.adulthood:
-            if self.profession == 'farmer':
-            	self.village.farmers.remove(self)
-            elif self.profession == 'crafter':
-            	self.village.crafters.remove(self)
-            else:
-            	self.village.guards.remove(self)
         #print "{0} HAS DIED!".format(self)
 
 

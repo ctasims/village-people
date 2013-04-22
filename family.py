@@ -31,17 +31,19 @@ class Family:
 
         self.food = 0
 
+        self.new_prof_rate = 0.01
         # on startup, profession manually assigned
         if profession is not None:
             self.living_with_parents = False
             self.profession = profession
         else:
             self.profession = self.dad.profession
+            # add family to prof list
             self.living_with_parents = True
+        self.village.prof_list[self.profession].append(self)
         self.output = self.village.max_solo_outputs[self.profession]
         # increase output base amt
-        prof = self.profession
-        self.village.max_solo_outputs[prof] = round(self.village.max_solo_outputs[prof] * 1.1)
+        self.village.max_solo_outputs[self.profession] = round(self.village.max_solo_outputs[self.profession] * 1.1)
 
 
         self.get_house()
@@ -66,16 +68,20 @@ class Family:
 
 
     def yearly_update(self):
-        try:
-            if self.dad:
-                self.dad.birthday()
-            if self.mom:
-                self.mom.birthday()
-            for kid in self.kids:
-                kid.birthday()
-            self.check_for_baby(self.village.baby_rate)
-        except:
-            print 'yearly update'
+        if self.dad:
+            self.dad.birthday()
+        if self.mom:
+            self.mom.birthday()
+        for kid in self.kids:
+            kid.birthday()
+        self.check_for_baby(self.village.baby_rate)
+        # check if we need to change professions
+        if random.random() < self.new_prof_rate:
+            prof = self.profession
+            self.village.prof_list[prof].remove(self)
+            self.profession = self.village.update_profession()
+            self.village.prof_list[self.profession].append(self)
+
 
 
     def monthly_update(self):
@@ -121,7 +127,7 @@ class Family:
             # dad died!
             self.dad = None
             prof = self.profession
-            self.village.max_solo_outputs[prof] = round(self.village.max_solo_outputs[prof] * 0.90)
+            self.village.max_solo_outputs[prof] = round(self.village.max_solo_outputs[prof] * 0.95)
             self.update_stats()
 
         if self.mom:
@@ -132,7 +138,7 @@ class Family:
             # mom died!
             self.mom = None
             prof = self.profession
-            self.village.max_solo_outputs[prof] = round(self.village.max_solo_outputs[prof] * 0.95)
+            self.village.max_solo_outputs[prof] = round(self.village.max_solo_outputs[prof] * 0.98)
             self.update_stats()
 
         removal_indexes = []  # if child dies, need this to later remove them
@@ -148,7 +154,9 @@ class Family:
 
         # if whole family dies off...
         if self.size == 0:
+            prof = self.profession
             self.village.families.remove(self)
+            self.village.prof_list[prof].remove(self)
             self.village.families = filter(None, self.village.families)
 
             if self.house:
@@ -288,7 +296,7 @@ class Family:
 
         # living at home means lower productivity
         if self.living_with_parents:
-            self.output -= max_solo * 0.05
+            self.output -= max_solo * 0.01
         else:
         	pass
 
@@ -300,7 +308,7 @@ class Family:
         if self.preparedness is "good":
             self.output += max_solo * 0.10
         else:
-            self.output -= max_solo * 0.20
+            self.output -= max_solo * 0.10
         # adjust for going over max or below min
         self.output = max_o if self.output > max_o else self.output
         self.output = 0 if self.output < 0 else self.output
@@ -308,9 +316,9 @@ class Family:
         if 0.5 < hp_ratio <= 1:
         	pass
         elif 0.25 < hp_ratio <= 0.5:
-            self.output -= max_solo * 0.20
+            self.output -= max_solo * 0.10
         else:
-        	self.output -= max_solo * 0.30
+        	self.output -= max_solo * 0.15
         # adjust for going over max or below min
         self.output = max_o if self.output > max_o else self.output
         self.output = 0 if self.output < 0 else self.output
