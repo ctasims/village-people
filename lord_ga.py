@@ -43,8 +43,8 @@ class Lord_GA:
 
             # now modify rates
             P = self.tournament_select(P, results, elitism)
-            #P = self.mutate(P)
-            #P = self.one_point_crossover(P)
+            P = self.mutate(P)
+            P = self.one_point_crossover(P)
 
             run += 1
 
