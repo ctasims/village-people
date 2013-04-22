@@ -6,7 +6,7 @@ import sys
 
 class Village:
 
-    def __init__(self, rates, num_families):
+    def __init__(self, rates, num_families, professions=None):
         self.num_villagers = 0
         self.goods = 1000
         self.food = 1000
@@ -15,7 +15,7 @@ class Village:
         self.villagers = []
         self.prospects = []  # list available mates
         self.families = []
-        self.max_solo_outputs = {'farmer': 80, 'crafter': 30, 'guard': 0}
+        self.max_solo_outputs = {'farmer': 180, 'crafter': 30, 'guard': 0}
         self.max_fam_outputs = {'farmer': 240, 'crafter': 90, 'guard': 0}
 
         # profs
@@ -45,7 +45,8 @@ class Village:
         c = 'crafter'
         f = 'farmer'
         g = 'guard'
-        professions = [f, f, f, c, f, c, f, c, c, g]
+        if professions is None:
+            professions = [f, f, f, c, f, c, f, c, c, g]
 
         colonist_men = []
         colonist_women = []
@@ -71,7 +72,7 @@ class Village:
                 print "food: {0}, goods {1}".format(self.food, self.goods)
                 return year
 
-            print "\n\n====== YEAR {0} ======".format(year)
+            print "====== YEAR {0} ======".format(year)
             print "food: {0}, goods {1}".format(self.food, self.goods)
             print "{0} families, {1} villagers".format(len(self.families),
                 len(self.villagers))
@@ -80,6 +81,7 @@ class Village:
             for month in range(10):
                 for family in self.families:
                     fam_status = family.monthly_update()
+                print '\n'
 
                 #print "VILLAGE: {0}/{1}\n".format(self.food, self.goods)
 
@@ -139,10 +141,11 @@ class Village:
 
 
 if __name__ == "__main__":
-    rates = [0.2, 0.6, 0, 0.1]
-    for x in range(10):
-        vill = Village(rates)
-        fitness = vill.run_village(300)
-        print fitness
-        vill = None
+    rates = [0.5, 0.5, 0, 0.1]
+    num_families = 4
+    f = 'farmer'
+    c = 'crafter'
+    vill = Village(rates, num_families, [f, f, c, c])
+    fitness = vill.run_village(300)
+    print fitness
 

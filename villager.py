@@ -145,7 +145,6 @@ class Villager:
             else:
                 dad_house = None
             self.family = Family(self.village, dad_house, dad=self)
-            self.village.families.append(self.family)
             #print "\n{0} becomes a {1}".format(self, self.profession)
         elif self.gender == 'f':
             if self.family:

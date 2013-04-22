@@ -21,6 +21,7 @@ class Family:
         # house is home of dad's parents. On startup it's just an empty house.
         self.size = 1 if dad else 0
         self.village = village
+        self.village.families.append(self)
         self.house = house
         self.output = None  # depends on profession
         self.mom = None
@@ -64,7 +65,7 @@ class Family:
         else:  # guard
         	food = "-"
         	craft = "g"
-        #print "%-14.14s hp: %6d %6s %6s" % (self, self.compute_hp(), food,craft)
+        print "%-14.14s hp: %6d %6s %6s" % (self, self.compute_hp(), food,craft)
 
 
     def yearly_update(self):
@@ -127,7 +128,7 @@ class Family:
             # dad died!
             self.dad = None
             prof = self.profession
-            self.village.max_solo_outputs[prof] = round(self.village.max_solo_outputs[prof] * 0.95)
+            #self.village.max_solo_outputs[prof] = round(self.village.max_solo_outputs[prof] * 0.95)
             self.update_stats()
 
         if self.mom:
@@ -138,7 +139,7 @@ class Family:
             # mom died!
             self.mom = None
             prof = self.profession
-            self.village.max_solo_outputs[prof] = round(self.village.max_solo_outputs[prof] * 0.98)
+            #self.village.max_solo_outputs[prof] = round(self.village.max_solo_outputs[prof] * 0.98)
             self.update_stats()
 
         removal_indexes = []  # if child dies, need this to later remove them
@@ -308,7 +309,7 @@ class Family:
         if self.preparedness is "good":
             self.output += max_solo * 0.10
         else:
-            self.output -= max_solo * 0.10
+            self.output -= max_solo * 0.03
         # adjust for going over max or below min
         self.output = max_o if self.output > max_o else self.output
         self.output = 0 if self.output < 0 else self.output
