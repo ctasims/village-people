@@ -132,7 +132,7 @@ class Family:
             # mom died!
             self.mom = None
             prof = self.profession
-            self.village.max_solo_outputs[prof] = round(self.village.max_solo_outputs[prof] * 0.90)
+            self.village.max_solo_outputs[prof] = round(self.village.max_solo_outputs[prof] * 0.95)
             self.update_stats()
 
         removal_indexes = []  # if child dies, need this to later remove them
@@ -310,7 +310,7 @@ class Family:
         elif 0.25 < hp_ratio <= 0.5:
             self.output -= max_solo * 0.20
         else:
-        	self.output -= max_solo * 0.50
+        	self.output -= max_solo * 0.30
         # adjust for going over max or below min
         self.output = max_o if self.output > max_o else self.output
         self.output = 0 if self.output < 0 else self.output

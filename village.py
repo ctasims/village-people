@@ -6,7 +6,7 @@ import sys
 
 class Village:
 
-    def __init__(self, rates):
+    def __init__(self, rates, num_families):
         self.num_villagers = 0
         self.goods = 1000
         self.food = 1000
@@ -43,7 +43,7 @@ class Village:
 
         colonist_men = []
         colonist_women = []
-        num_families = 10
+        num_families = num_families
         for indx in range(num_families):
             new_woman = Villager(self, None, 'f')
             new_woman.force_grow_up()
@@ -106,8 +106,7 @@ class Village:
                 raise Exception("ERROR: Bad profession given.")
             return profession
         else:
-            #random.seed()
-            rate = random.uniform(0, 1)
+            rate = random.random()
             if rate <= self.farmer_rate:
                 self.farmers.append(villager)
                 return 'farmer'
@@ -128,13 +127,7 @@ class Village:
 
 if __name__ == "__main__":
     rates = [0.2, 0.6, 0, 0.1]
-    #random.seed(0.08)
-    #vill = Village(rates)
-    #fitness = vill.run_village(100)
-    #print fitness
     for x in range(10):
-        #seed = x / 1530.0
-        #random.seed(seed)
         vill = Village(rates)
         fitness = vill.run_village(300)
         print fitness
