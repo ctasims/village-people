@@ -36,7 +36,6 @@ class Villager:
         """
         self.village = village
         self.profession = None
-        self.village.villagers.append(self)
         self.family = family
         self.spouse = None
         self.village.num_villagers += 1
@@ -66,6 +65,8 @@ class Villager:
         # on startup, create family-less villagers
         if family is None:
             pass
+
+        self.village.villagers.append(self)
 
     def __repr__(self):
         return self.name
@@ -125,7 +126,10 @@ class Villager:
         Notify your family.
         If male, remove from prof list
         """
-        self.village.villagers.remove(self)
+        try:
+            self.village.villagers.remove(self)
+        except:
+            pass
         #print "{0} HAS DIED!".format(self)
 
 
@@ -166,26 +170,32 @@ class Villager:
         	self.village.prospects.append(self)
         elif self.gender == 'm':
             if self.village.prospects:
+                bride = None
                 for girl in self.village.prospects:
                     if girl.family == self.family:  # sister!
                     	continue
                     else:
                     	bride = girl
+                    	self.village.prospects.remove(girl)
                     	break
                 if bride is None:  # prospects are all sisters
                 	return self
                 # get married! If woman has children, they tag along
-                bride = self.village.prospects.pop()
+                kids = None
                 if bride.family:
-                    kids = bride.family.kids
-                else:
-                    kids = None
+                    if bride.family.kids != []:
+                        kids = bride.family.kids
+
                 if kids is not None:
                 	# add kids to new dad's family and remove from old
                     for kid in kids:
                     	kid.family = self.family
                         self.family.kids.append(kid)
                     bride.family.kids = []
+                # clear references...
+                if bride.family in self.village.families:
+                    self.village.families.remove(bride.family)
+                bride.family = None
                 bride.family = self.family
                 bride.spouse = self
                 self.spouse = bride

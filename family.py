@@ -100,21 +100,17 @@ class Family:
 
         # get food
         if self.village.food >= self.req_food:
-            #self.food = self.req_food
             self.nourishment = "good"
             self.village.food -= self.req_food
         else:  # not enough food to be well-fed
-            #self.food = self.village.food
             self.nourishment = "poor"
             self.village.food = 0
 
         # get goods
         if self.village.goods >= self.req_goods:
-            #self.goods = self.req_goods
             self.preparedness = "good"
             self.village.goods -= self.req_goods
         else:  # not enough goods for max output
-            #self.goods = self.village.goods
             self.preparedness = "poor"
             self.village.goods = 0
 
@@ -127,7 +123,8 @@ class Family:
         if not dad_status:
             # dad died!
             self.dad = None
-            self.mom.spouse = None
+            if self.mom:
+                self.mom.spouse = None
             prof = self.profession
             #self.village.max_solo_outputs[prof] = round(self.village.max_solo_outputs[prof] * 0.95)
             self.update_stats()
@@ -139,7 +136,8 @@ class Family:
         if not mom_status:
             # mom died!
             self.mom = None
-            self.dad.spouse = None
+            if self.dad:
+                self.dad.spouse = None
             prof = self.profession
             #self.village.max_solo_outputs[prof] = round(self.village.max_solo_outputs[prof] * 0.98)
             self.update_stats()
@@ -156,7 +154,7 @@ class Family:
         self.update_stats()
 
         # if whole family dies off...
-        if self.size == 0:
+        if len(self.get_members()) == 0:
             prof = self.profession
             self.village.families.remove(self)
             self.village.prof_list[prof].remove(self)
