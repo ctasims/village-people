@@ -162,7 +162,7 @@ class Villager:
         Villagers do not remarry if spouse dies.
         """
         # women go on prospects list
-        if self.gender == 'f':
+        if self.gender == 'f' and self not in self.village.prospects:
         	self.village.prospects.append(self)
         elif self.gender == 'm':
             if self.village.prospects:

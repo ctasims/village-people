@@ -127,6 +127,7 @@ class Family:
         if not dad_status:
             # dad died!
             self.dad = None
+            self.mom.spouse = None
             prof = self.profession
             #self.village.max_solo_outputs[prof] = round(self.village.max_solo_outputs[prof] * 0.95)
             self.update_stats()
@@ -138,6 +139,7 @@ class Family:
         if not mom_status:
             # mom died!
             self.mom = None
+            self.dad.spouse = None
             prof = self.profession
             #self.village.max_solo_outputs[prof] = round(self.village.max_solo_outputs[prof] * 0.98)
             self.update_stats()
@@ -297,7 +299,7 @@ class Family:
 
         # living at home means lower productivity
         if self.living_with_parents:
-            self.output -= max_solo * 0.01
+            self.output -= max_solo * 0.05
         else:
         	pass
 
@@ -309,7 +311,7 @@ class Family:
         if self.preparedness is "good":
             self.output += max_solo * 0.10
         else:
-            self.output -= max_solo * 0.03
+            self.output -= max_solo * 0.10
         # adjust for going over max or below min
         self.output = max_o if self.output > max_o else self.output
         self.output = 0 if self.output < 0 else self.output
@@ -319,7 +321,7 @@ class Family:
         elif 0.25 < hp_ratio <= 0.5:
             self.output -= max_solo * 0.10
         else:
-        	self.output -= max_solo * 0.15
+        	self.output -= max_solo * 0.25
         # adjust for going over max or below min
         self.output = max_o if self.output > max_o else self.output
         self.output = 0 if self.output < 0 else self.output
