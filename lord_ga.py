@@ -42,9 +42,9 @@ class Lord_GA:
             print run
 
             # now modify rates
-            P = self.tournament_select(P, results, elitism)
-            P = self.mutate(P)
-            P = self.one_point_crossover(P)
+            #P = self.tournament_select(P, results, elitism)
+            #P = self.mutate(P)
+            #P = self.one_point_crossover(P)
 
             run += 1
 
@@ -171,9 +171,9 @@ if __name__ == "__main__":
     # short analysis
     long_analysis = False
     if not long_analysis:
-        villages_per_run = 2
+        villages_per_run = 100
         num_families = 10
-        max_runs = 2
+        max_runs = 50
         max_fitness = 1000
     else:
         # long analysis

@@ -1,5 +1,6 @@
 from house import House
 import random
+import uuid
 
 
 class Family:
@@ -19,18 +20,24 @@ class Family:
         # dad is only None on startup, for initial families
         # dad is the dad of THIS family, i.e. the main man
         # house is home of dad's parents. On startup it's just an empty house.
-        self.size = 1 if dad else 0
+        # first, family stats/data
+        self.id = uuid.uuid4()
         self.village = village
         self.village.families.append(self)
         self.house = house
-        self.output = None  # depends on profession
+        self.nourishment = "good"
+        self.preparedness = "good"
+        self.food = 0
+        self.output = 0
+        # villager attrs
+        self.vgr_req_food = 30
+        self.vgr_req_goods = 10
+
+        # relations
         self.mom = None
         self.dad = dad
-        #self.chance_of_baby = self.village.baby_rate
-        self.nourishment = "good"
         self.kids = []
 
-        self.food = 0
 
         self.new_prof_rate = 0.01
         # on startup, profession manually assigned
@@ -38,22 +45,28 @@ class Family:
             self.living_with_parents = False
             self.profession = profession
         else:
-            self.profession = self.dad.profession
-            # add family to prof list
             self.living_with_parents = True
+            self.profession = self.village.new_profession()
         self.village.prof_list[self.profession].append(self)
-        self.output = self.village.max_solo_outputs[self.profession]
-        # increase output base amt
-        self.village.max_solo_outputs[self.profession] = round(self.village.max_solo_outputs[self.profession] * 1.1)
 
-
-        self.get_house()
-        # set stats
-        self.update_stats()
+        self.update_stats(True)
 
 
     def __repr__(self):
-        return "{0} ({1})".format(self.dad, self.size)
+        if self.dad:
+        	label = "{0} ({1})".format(self.dad, self.size)
+        elif self.mom:
+        	label = "{0} ({1})".format(self.mom, self.size)
+        else:
+        	label = "KIDS ({1})".format(self.mom, self.size)
+        return label
+
+    def __eq__(self, other):
+        """
+        check if two families are the same
+        """
+        return self.id == other.id
+
 
     def print_status(self):
         if self.profession == 'crafter':
@@ -65,7 +78,7 @@ class Family:
         else:  # guard
         	food = "-"
         	craft = "g"
-        print "%-14.14s hp: %6d %6s %6s" % (self, self.compute_hp(), food,craft)
+        #print "%-14.14s hp: %6d %6s %6s" % (self, self.hp, food,craft)
 
 
     def yearly_update(self):
@@ -77,12 +90,11 @@ class Family:
             kid.birthday()
         self.check_for_baby(self.village.baby_rate)
         # check if we need to change professions
-        if random.random() < self.new_prof_rate:
-            prof = self.profession
-            self.village.prof_list[prof].remove(self)
-            self.profession = self.village.update_profession()
-            self.village.prof_list[self.profession].append(self)
-
+        #if random.random() < self.new_prof_rate:
+            #prof = self.profession
+            #self.village.prof_list[prof].remove(self)
+            #self.profession = self.village.update_profession()
+            #self.village.prof_list[self.profession].append(self)
 
 
     def monthly_update(self):
@@ -118,59 +130,23 @@ class Family:
         # Also handle deaths
         if self.dad:
             dad_status = self.dad.monthly_update()
-        else:
-        	dad_status = None
-        if not dad_status:
-            # dad died!
-            self.dad = None
-            if self.mom:
-                self.mom.spouse = None
-            prof = self.profession
-            #self.village.max_solo_outputs[prof] = round(self.village.max_solo_outputs[prof] * 0.95)
-            self.update_stats()
-
         if self.mom:
             mom_status = self.mom.monthly_update()
-        else:
-        	mom_status = None
-        if not mom_status:
-            # mom died!
-            self.mom = None
-            if self.dad:
-                self.dad.spouse = None
-            prof = self.profession
-            #self.village.max_solo_outputs[prof] = round(self.village.max_solo_outputs[prof] * 0.98)
-            self.update_stats()
 
-        removal_indexes = []  # if child dies, need this to later remove them
+        losses = []
         for kid in self.kids:
             status = kid.monthly_update()
             if not status:
             	# kid died!
-            	removal_indexes.append(self.kids.index(kid))
-        for indx in removal_indexes:
-        	self.kids[indx] = None
-        self.kids = filter(None, self.kids)
-        self.update_stats()
-
-        # if whole family dies off...
-        if len(self.get_members()) == 0:
-            prof = self.profession
-            self.village.families.remove(self)
-            self.village.prof_list[prof].remove(self)
-            self.village.families = filter(None, self.village.families)
-
-            if self.house:
-                self.village.empty_houses.append(self.house)
-
-        	return False
+            	losses.append(kid)
+        for kid in losses:
+        	self.remove_kid(kid)
 
         # update family output
-        output = self.update_output()
         if self.profession == 'farmer':
-            self.village.food += output
+            self.village.food += self.output
         elif self.profession == 'crafter':
-            self.village.goods += output
+            self.village.goods += self.output
         elif self.profession == 'guard':
             pass
 
@@ -178,61 +154,95 @@ class Family:
         return True
 
 
-    def update_stats(self):
+    def update_size(self):
+        """
+        Compile family members to get size of family.
+        Should NEVER BE CALLED by method other than update_stats!!!
+        """
+        members = []
+        members = [self.dad, self.mom] + self.kids
+        self.members = filter(None, members)  # get rid of None elements
+        self.size = len(self.members)
+        return self.size
+
+    def update_members(self, initial=False):
+        """
+        Compile family members and store them.
+        If family empty and we're not initializing, remove family.
+        Should NEVER BE CALLED by method other than update_stats!!!
+        """
+        members = [self.dad, self.mom] + self.kids
+        self.members = filter(None, members)  # get rid of None elements
+        if not initial and self.members == []:  # empty family, get rid of it
+        	self.village.remove_family(self)
+        return self.members
+
+    def update_stats(self, initial=False):
         """
         Update all stats of family to ensure everything jives.
         Updates members, required stuff, output, max_output
         """
-        members = self.get_members()  # update members
-        self.req_food = sum([vill.req_food for vill in members])
-        self.req_goods = sum([vill.req_goods for vill in members])
-        # update max_output based on # parents
-        self.max_output = 0
-        self.max_solo_output = self.village.max_solo_outputs[self.profession]
-        if self.dad:
-            self.max_output += self.max_solo_output
-        if self.mom:
-            self.max_output += self.max_solo_output
-        if self.kids:
-        	self.max_output += len(self.kids) * self.max_solo_output
-        #self.output = self.max_output
-        self.compute_hp()
+        # update family size and member info
+        size = self.update_size()
+        members = self.update_members(initial)
+        if not members and not initial:
+        	return False
+            # if empty, family should already be deleted
+            #raise Exception("{0}: no members!".format(self))
+
+        self.req_food = self.vgr_req_food * self.size
+        self.req_goods = self.vgr_req_goods * self.size
+        self.hp = sum([vgr.hp for vgr in members])
+
+        # update profession details
+        self.max_output = self.village.max_outputs[self.profession]
+        self.output = self.update_output()
 
 
-    def get_members(self):
+    def remove_kid(self, kid):
+        if kid in self.kids:
+        	self.kids.remove(kid)
+        #self.update_stats()
+        return self
+
+
+    def set_profession(self, prof):
+        self.profession = prof
+        self.village.prof_list[prof].append(self)
+        self.update_stats()
+
+
+    def add_mom(self, mom):
         """
-        Determine family members and size of family.
-        Should be called on every birth/death/new parent
-        """
-        members = []
-        members = [self.dad, self.mom] + self.kids
-        members = filter(None, members)  # get rid of None elements
-        if not members:
-            self.size = 0
-        else:
-            self.size = len(members)
-        self.members = members
-        return self.members
-
-
-    def compute_hp(self):
-        """ Calculates total health of family
-        """
-        self.hp = sum([vill.hp for vill in self.members])
-        return self.hp
-
-
-    def add_mom(self, villager):
-        """ add mom to family.
+        Add mom to family.
         Called on marriage.
         """
-        self.mom = villager
-        self.output += self.max_solo_output
-        prof = self.profession
-        self.village.max_solo_outputs[prof] = round(self.village.max_solo_outputs[prof] * 1.1)
+        #prior_family = mom.family
+        self.mom = mom
+        mom.family = self
+        #prior_family.update_stats()  # this should delete fam if it's empty
+        if self.dad:
+        	self.dad.spouse = self.mom
+        	self.mom.spouse = self.dad
         self.update_stats()
         return self
 
+    def add_dad(self, dad):
+        prior_family = dad.family
+        self.dad = dad
+        dad.family = self
+        prior_family.update_stats()  # this should delete fam if it's empty
+        if self.mom:
+        	self.dad.spouse = self.mom
+        	self.mom.spouse = self.dad
+        self.update_stats()
+
+    def add_kid(self, kid):
+        """
+        Used when initializing populace
+        """
+        self.kids.append(kid)
+        self.update_stats()
 
     def check_for_baby(self, chance):
         """ have a new baby in family.
@@ -243,13 +253,8 @@ class Family:
                 baby = self.mom.give_birth()
                 self.kids.append(baby)
                 self.update_stats()
-                #print "{0} HAD A BABY!!".format(self)
                 return baby
-            else:
-            	pass
-                #print "family %s can't have kids - no mom!" % self
-        else:
-        	pass
+        return self
 
 
     def get_house(self):
@@ -257,22 +262,13 @@ class Family:
         When family is living with parents of dad, try to get a diff house.
         This requires subtracting goods from village.
         """
-        # first see if there is empty house
-        if self.village.empty_houses:
-            self.house = self.village.empty_houses.pop()
+        if self.village.goods >= 100:
+            if self.village.empty_houses:
+                self.house = self.village.empty_houses.pop()
+            else:
+                self.house = House()
+                self.village.goods -= 100
             self.living_with_parents = False
-            #print "{0} found an empty house!".format(self)
-            return
-
-        available_goods = self.village.goods
-        if available_goods >= 100:
-            self.house = House()
-            self.village.goods -= 100
-            self.living_with_parents = False
-        else:
-        	pass
-            #print "{0} can't get new house!".format(self)
-        return
 
 
     def update_output(self):
@@ -283,51 +279,42 @@ class Family:
         """
         if self.profession == 'guard':
         	return 0
-        max_o = self.max_output
+        if self.size == 0:
+        	return 0
 
-        max_solo = self.max_solo_output
-        if max_o == 0:
-            #print "No family members!"
-            return
-
-        fam_size = self.size
-        max_fam_hp = fam_size * 1000
-        curr_fam_hp = float(self.compute_hp())
-        hp_ratio = curr_fam_hp / max_fam_hp
+        max_out = self.max_output
 
         # living at home means lower productivity
         if self.living_with_parents:
-            self.output -= max_solo * 0.05
+            self.output -= max_out * 0.05
         else:
         	pass
 
         # adjust for going over max or below min
-        self.output = max_o if self.output > max_o else self.output
+        self.output = max_out if self.output > max_out else self.output
         self.output = 0 if self.output < 0 else self.output
 
         # check family preparedness
         if self.preparedness is "good":
-            self.output += max_solo * 0.10
+            self.output += max_out * 0.10
         else:
-            self.output -= max_solo * 0.10
+            self.output -= max_out * 0.10
         # adjust for going over max or below min
-        self.output = max_o if self.output > max_o else self.output
+        self.output = max_out if self.output > max_out else self.output
         self.output = 0 if self.output < 0 else self.output
 
+        max_fam_hp = self.size * 1000
+        curr_fam_hp = float(self.hp)
+        hp_ratio = curr_fam_hp / max_fam_hp
         if 0.5 < hp_ratio <= 1:
         	pass
         elif 0.25 < hp_ratio <= 0.5:
-            self.output -= max_solo * 0.10
+            self.output -= max_out * 0.10
         else:
-        	self.output -= max_solo * 0.25
+        	self.output -= max_out * 0.25
         # adjust for going over max or below min
-        self.output = max_o if self.output > max_o else self.output
+        self.output = max_out if self.output > max_out else self.output
         self.output = 0 if self.output < 0 else self.output
-
-        # family can only produce so much. We'll cap max output
-        max_fam_output = self.village.max_fam_outputs[self.profession]
-        if self.output > max_fam_output:
-            self.output = max_fam_output
 
         return round(self.output)
 

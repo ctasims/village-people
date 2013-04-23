@@ -32,6 +32,7 @@ nosetests.xml
 *.mo
 
 *.DS_Store
+/results
 
 # Mr Developer
 .mr.developer.cfg
