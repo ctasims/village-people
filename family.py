@@ -25,8 +25,10 @@ class Family:
         self.village = village
         self.village.families.append(self)
         self.house = house
+        self.hp = 100
         self.nourishment = "good"
         self.preparedness = "good"
+        self.members = []
         self.food = 0
         self.output = 0
         # villager attrs
@@ -39,7 +41,8 @@ class Family:
         self.kids = []
 
 
-        self.new_prof_rate = 0.01
+        #self.new_prof_rate = 0.30
+
         # on startup, profession manually assigned
         if profession is not None:
             self.living_with_parents = False
@@ -78,7 +81,7 @@ class Family:
         else:  # guard
         	food = "-"
         	craft = "g"
-        #print "%-14.14s hp: %6d %6s %6s" % (self, self.hp, food,craft)
+        print "%-14.14s hp: %6d %6s %6s" % (self, self.hp, food,craft)
 
 
     def yearly_update(self):
@@ -88,7 +91,8 @@ class Family:
             self.mom.birthday()
         for kid in self.kids:
             kid.birthday()
-        self.check_for_baby(self.village.baby_rate)
+        if len(self.kids) < 10:
+            self.check_for_baby(self.village.baby_rate / 2.0)
         # check if we need to change professions
         #if random.random() < self.new_prof_rate:
             #prof = self.profession
@@ -97,7 +101,7 @@ class Family:
             #self.village.prof_list[self.profession].append(self)
 
 
-    def monthly_update(self):
+    def monthly_update(self, show_status=False):
         """
         update stats.
         update output.
@@ -127,20 +131,37 @@ class Family:
             self.village.goods = 0
 
         # villager update
-        # Also handle deaths
-        if self.dad:
-            dad_status = self.dad.monthly_update()
-        if self.mom:
-            mom_status = self.mom.monthly_update()
-
         losses = []
-        for kid in self.kids:
-            status = kid.monthly_update()
-            if not status:
+        self.hp = 0
+        for member in self.members:
+            if self.nourishment is "good":
+                mod =  member.age_hp[member.age_group]
+            else:
+                mod = -300
+            member.hp += mod
+            member.hp = 1000 if member.hp > 1000 else member.hp
+            self.hp += member.hp
+
+            # villager dies!
+            if member.hp < 0:
+            	losses.append(member)
+
+        for dead in losses:
+            dead.die()
+        # Also handle deaths
+        #if self.dad:
+            #dad_status = self.dad.monthly_update()
+        #if self.mom:
+            #mom_status = self.mom.monthly_update()
+
+        #losses = []
+        #for kid in self.kids:
+            #status = kid.monthly_update()
+            #if not status:
             	# kid died!
-            	losses.append(kid)
-        for kid in losses:
-        	self.remove_kid(kid)
+                #losses.append(kid)
+        #for kid in losses:
+            #self.remove_kid(kid)
 
         # update family output
         if self.profession == 'farmer':
@@ -150,49 +171,36 @@ class Family:
         elif self.profession == 'guard':
             pass
 
-        self.print_status()
+        if show_status:
+            self.print_status()
+
         return True
 
-
-    def update_size(self):
-        """
-        Compile family members to get size of family.
-        Should NEVER BE CALLED by method other than update_stats!!!
-        """
-        members = []
-        members = [self.dad, self.mom] + self.kids
-        self.members = filter(None, members)  # get rid of None elements
-        self.size = len(self.members)
-        return self.size
-
-    def update_members(self, initial=False):
-        """
-        Compile family members and store them.
-        If family empty and we're not initializing, remove family.
-        Should NEVER BE CALLED by method other than update_stats!!!
-        """
-        members = [self.dad, self.mom] + self.kids
-        self.members = filter(None, members)  # get rid of None elements
-        if not initial and self.members == []:  # empty family, get rid of it
-        	self.village.remove_family(self)
-        return self.members
 
     def update_stats(self, initial=False):
         """
         Update all stats of family to ensure everything jives.
+        Compile family members and store them.
+        Compile family members to get size of family.
         Updates members, required stuff, output, max_output
         """
         # update family size and member info
-        size = self.update_size()
-        members = self.update_members(initial)
-        if not members and not initial:
+        self.members = []
+        if self.dad:
+        	self.members = [self.dad]
+        if self.mom:
+        	self.members += [self.mom]
+        if self.kids:
+        	self.members += self.kids
+
+        self.size = len(self.members)
+        if not self.members and not initial:
+        	self.village.remove_family(self)
         	return False
-            # if empty, family should already be deleted
-            #raise Exception("{0}: no members!".format(self))
 
         self.req_food = self.vgr_req_food * self.size
         self.req_goods = self.vgr_req_goods * self.size
-        self.hp = sum([vgr.hp for vgr in members])
+        #self.hp = sum([vgr.hp for vgr in self.members])
 
         # update profession details
         self.max_output = self.village.max_outputs[self.profession]
@@ -209,6 +217,8 @@ class Family:
     def set_profession(self, prof):
         self.profession = prof
         self.village.prof_list[prof].append(self)
+        self.output = self.village.max_outputs[prof] / 2.0
+        self.max_output = self.village.max_outputs[prof]
         self.update_stats()
 
 
@@ -298,7 +308,7 @@ class Family:
         if self.preparedness is "good":
             self.output += max_out * 0.10
         else:
-            self.output -= max_out * 0.10
+            self.output -= max_out * 0.05
         # adjust for going over max or below min
         self.output = max_out if self.output > max_out else self.output
         self.output = 0 if self.output < 0 else self.output
@@ -309,9 +319,9 @@ class Family:
         if 0.5 < hp_ratio <= 1:
         	pass
         elif 0.25 < hp_ratio <= 0.5:
-            self.output -= max_out * 0.10
+            self.output -= max_out * 0.05
         else:
-        	self.output -= max_out * 0.25
+        	self.output -= max_out * 0.10
         # adjust for going over max or below min
         self.output = max_out if self.output > max_out else self.output
         self.output = 0 if self.output < 0 else self.output

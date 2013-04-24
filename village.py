@@ -7,16 +7,19 @@ import sys
 
 class Village:
 
-    def __init__(self, rates, num_families, professions=None):
+    def __init__(self, rates, num_families):
         self.goods = 1000
         self.food = 1000
         self.year = 0
+        self.peak_villagers = 0
+        self.peak_families = 0
 
         self.villagers = []
         self.prospects = []  # list available mates
         self.families = []
-        #self.max_solo_outputs = {'farmer': 180, 'crafter': 30, 'guard': 0}
-        self.max_outputs = {'farmer': 240, 'crafter': 90, 'guard': 0}
+        # avg years: 200
+        #self.max_outputs = {'farmer': 400, 'crafter': 180, 'guard': 0}
+        self.max_outputs = {'farmer': 180, 'crafter': 110, 'guard': 0}
 
         # profs
         self.prof_list = {
@@ -24,26 +27,31 @@ class Village:
                 'crafter': [],
                 'guard': [],
                 }
-        self.new_prof_rate = 0.10
+        #self.new_prof_rate = 0.10
 
         # GA controls
         rate_total = sum(rates[:3])
         self.farmer_rate = rates[0] / rate_total
         self.crafter_rate = rates[1] / rate_total
         self.guard_rate = rates[2] / rate_total
-        #self.baby_rate = rates[3]
-        self.baby_rate = 0.15
+        self.baby_rate = rates[3]
+        #self.baby_rate = 0.15
 
         # houses
         self.houses = []
         # create empty houses
         self.empty_houses = [House() for x in range(num_families*2)]
 
-        c = 'crafter'
         f = 'farmer'
+        c = 'crafter'
         g = 'guard'
-        if professions is None:  # standard spread, if we don't input
-            professions = [f, f, f, c, f, c, f, c, c, g]
+        possible_profs = [c, f, g]
+        #if professions is None:  # standard spread, if we don't input
+        professions = []
+        for x in range(num_families):
+            professions.append(self.new_profession())
+        #professions = [f, f, f, f, c, c, c, c, g, g]
+        self.profession_init = professions
 
         for indx in range(num_families):
             # the profs assigned here don't matter
@@ -64,28 +72,48 @@ class Village:
         # start with 1 kid each
         for family in self.families:
             family.check_for_baby(1)
+            family.update_stats(0)
 
 
-    def run_village(self, years):
+
+    def run_village(self, years, printing=True):
         for year in range(years):
             self.year = year
-            #import pdb; pdb.set_trace()
+            #import pdb
+            #if year == 150:
+                #pdb.set_trace()
             if self.families == []:
-                #print "THE VILLAGE PEOPLE DIED IN YEAR {0}".format(year)
-                #print "food: {0}, goods {1}".format(self.food, self.goods)
-                return year
+                if printing:
+                    print "THE VILLAGE PEOPLE DIED IN YEAR {0}".format(year)
+                    print "food: {0}, goods {1}".format(self.food, self.goods)
+                    print self.profession_init
+                return year, self.peak_villagers, self.peak_families
+            elif len(self.families) > 100:
+                return years, 1000, 100
 
-            #print "====== YEAR {0} ======".format(year)
-            #print "food: {0}, goods {1}".format(self.food, self.goods)
-            #print "{0} families, {1} villagers".format(len(self.families),
-                #len(self.villagers))
+            if printing:
+                print "====== YEAR {0} ======".format(year)
+                print "food: {0}, goods {1}".format(self.food, self.goods)
+                print "{0} families, {1} villagers".format(len(self.families),
+                    len(self.villagers))
+                show_status = True
+            else:
+            	show_status = False
 
             # loop over each month
             for month in range(10):
                 for family in self.families:
-                    fam_status = family.monthly_update()
-                #print '\n'
-                #print "VILLAGE: {0}/{1}\n".format(self.food, self.goods)
+                    fam_status = family.monthly_update(show_status)
+                if printing:
+                    print '\n'
+                    print "VILLAGE: {0}/{1}\n".format(self.food, self.goods)
+                # update counts
+            curr_villagers = len(self.villagers)
+            if curr_villagers > self.peak_villagers:
+                self.peak_villagers = curr_villagers
+            curr_families = len(self.families)
+            if curr_families > self.peak_families:
+                self.peak_families = curr_families
 
             # annual update for each family
             for family in self.families:
@@ -94,6 +122,9 @@ class Village:
             # every other year, 10% of food spoils
             if year % 2 == 0:
                 self.food = round( self.food * 0.9)
+
+        # YOU MADE IT!!!!!
+        return year, self.peak_villagers, self.peak_families
 
 
     def remove_family(self, family):
@@ -111,7 +142,6 @@ class Village:
         except:
             #print "####### FAMILY VALUE ERROR ##########"
             pass
-        self.families = filter(None, self.families)
         if family.house:
             self.empty_houses.append(family.house)
         family = None
@@ -126,7 +156,6 @@ class Village:
         except:
             #print "####### VALUE ERROR ##########"
             pass
-        self.villagers = filter(None, self.villagers)
         dad = vgr.family.dad
         mom = vgr.family.mom
         if dad is not None and dad == vgr:
@@ -177,11 +206,9 @@ class Village:
 
 
 if __name__ == "__main__":
-    rates = [0.5, 0.5, 0, 0.1]
-    num_families = 2
-    f = 'farmer'
-    c = 'crafter'
-    vill = Village(rates, num_families, [f, c])
-    fitness = vill.run_village(300)
-    print fitness
+    rates = [0.59, 0.58, 0, 0.25]
+    num_families = 10
+    vill = Village(rates, num_families)
+    fitness, count_villagers, count_families = vill.run_village(300)
+    print fitness, count_villagers, count_families
 

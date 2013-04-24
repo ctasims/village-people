@@ -72,29 +72,24 @@ class Villager:
         return self.id == other.id
 
 
-    def update_hp(self, mod):
-        self.hp += mod
-        self.hp = 1000 if self.hp > 1000 else self.hp
-        self.hp = 0 if self.hp < 0 else self.hp
-        return self.hp
+    #def monthly_update(self):
+        #"""
+        #every month villagers get food and update their hp.
+        #Without food, family will last 2-3 months before dying.
+        #"""
+        #if self.family.nourishment is "good":
+            #mod =  self.age_hp[self.age_group]
+        #else:
+            #mod = -300
+        #self.hp += mod
+        #self.hp = 1000 if self.hp > 1000 else self.hp
 
-
-    def monthly_update(self):
-        """
-        every month villagers get food and update their hp.
-        Without food, family will last 2-3 months before dying.
-        """
-        if self.family.nourishment is "good":
-        	self.update_hp(self.age_hp[self.age_group])
-        else:
-        	self.update_hp(-300)
-
-        # villager dies!
-        if self.hp == 0:
-            self.die()
-            return False
-        else:
-            return True
+        ## villager dies!
+        #if self.hp < 0:
+            #self.die()
+            #return False
+        #else:
+            #return True
 
 
     def birthday(self):
@@ -112,10 +107,9 @@ class Villager:
                 pass
         if self.age == self.adulthood:
             self.grow_up()
-        elif self.age > self.adulthood:
-        # adult only stuff
-            if self.spouse is None:
-                self.check_mate()
+        #elif self.age > self.adulthood:
+            #if self.spouse is None:
+                #self.check_mate()
 
 
     def die(self):
@@ -157,16 +151,15 @@ class Villager:
         	self.village.prospects.append(self)
 
         # MAN 
-        elif self.gender == 'm':
-            if not self.village.prospects:
-            	return self
-            else:  # get married
-                bride = self.village.prospects.pop()
-                prior_family = bride.family
-                self.family.add_mom(bride)
-                if bride is not prior_family.mom:  # just a kid growing up
-                	prior_family.remove_kid(bride)
-                else:  # she's a widow. Get kids, if any.
+        elif self.gender == 'm' and self.village.prospects:
+            bride = self.village.prospects.pop()
+            prior_family = bride.family
+            self.family.add_mom(bride)
+            prior_family.remove_kid(bride)
+            prior_family.update_stats()
+                #prior_family.mom = None
+                #if bride is not prior_family.mom:  # just a kid growing up
+                #else:  # she's a widow. Get kids, if any.
                     #import pdb; pdb.set_trace()
                     #if bride.family.kids:
                         #for kid in bride.family.kids:
@@ -175,9 +168,6 @@ class Villager:
                         #for kid in self.family:
                             #kid.family = self.family
                         #bride.family.kids = []
-                    prior_family.mom = None
-                prior_family.update_stats()
-                bride.family.update_stats()
 
 
     def force_grow_up(self):
