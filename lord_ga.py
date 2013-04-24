@@ -38,9 +38,6 @@ class Lord_GA:
                 vill = None
             # append set of 10 results to main set of results
             total_results.append(results)
-            #for result in results:
-                #print result
-            #print '\n'
 
             # now modify rates
             #elitism = True
@@ -55,8 +52,8 @@ class Lord_GA:
             if use_ga:
                 P = self.tournament_select(P, results, elitism)
                 #P = self.mutate(P, elitism)
-                #P = self.alternate_crossover(P, elitism)
-                P = self.three_point_crossover(P)
+                P = self.alternate_crossover(P, elitism)
+                #P = self.three_point_crossover(P)
 
             else:
                 # BASE: replace P with random vals
@@ -83,7 +80,7 @@ class Lord_GA:
         c = 'crafter'
         g = 'guard'
         prof_designations = []
-        for x in range(1200):
+        for x in range(20000):
             prof_designations.append(random.choice([c, f, g]))
         return prof_designations
 
@@ -247,8 +244,8 @@ if __name__ == "__main__":
     num_families = 10
     max_gens = 20
     max_fitness = 400
-    elitism = True
     use_ga = True
+    elitism = True
 
     ga = Lord_GA(villages_per_gen)
 

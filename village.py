@@ -18,11 +18,11 @@ class Village:
         self.prospects = []  # list available mates
         self.families = []
         # avg years: 200
-        #self.max_outputs = {'farmer': 400, 'crafter': 180, 'guard': 0}
         # one farmer can feed himself + 1 other person
         # so 1 farming family can feed another family
         # 1 crafter can maintain 5 others
-        self.max_outputs = {'farmer': 260, 'crafter': 140, 'guard': 0}
+        #self.max_outputs = {'farmer': 260, 'crafter': 140, 'guard': 0}
+        self.max_outputs = {'farmer': 300, 'crafter': 180, 'guard': 0}
 
         # profs
         self.prof_list = {
@@ -33,12 +33,6 @@ class Village:
         #self.new_prof_rate = 0.10
         self.prof_index = 0
 
-        # GA controls
-        #rate_total = sum(rates[:3])
-        #self.farmer_rate = rates[0] / rate_total
-        #self.crafter_rate = rates[1] / rate_total
-        #self.guard_rate = rates[2] / rate_total
-        #self.baby_rate = rates[3]
         self.baby_rate = 0.2
 
         # houses
