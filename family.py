@@ -30,7 +30,7 @@ class Family:
         self.preparedness = "good"
         self.members = []
         self.food = 0
-        self.output = 0
+        self.output = 50
         # villager attrs
         self.vgr_req_food = 30
         self.vgr_req_goods = 10
@@ -92,7 +92,7 @@ class Family:
         for kid in self.kids:
             kid.birthday()
         if len(self.kids) < 10:
-            self.check_for_baby(self.village.baby_rate / 2.0)
+            self.check_for_baby(self.village.baby_rate)
         # check if we need to change professions
         #if random.random() < self.new_prof_rate:
             #prof = self.profession
@@ -217,7 +217,7 @@ class Family:
     def set_profession(self, prof):
         self.profession = prof
         self.village.prof_list[prof].append(self)
-        self.output = self.village.max_outputs[prof] / 2.0
+        self.output = self.village.max_outputs[prof]
         self.max_output = self.village.max_outputs[prof]
         self.update_stats()
 

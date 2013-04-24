@@ -7,7 +7,7 @@ import sys
 
 class Village:
 
-    def __init__(self, rates, num_families):
+    def __init__(self, num_families, prof_designations=None):
         self.goods = 1000
         self.food = 1000
         self.year = 0
@@ -19,7 +19,10 @@ class Village:
         self.families = []
         # avg years: 200
         #self.max_outputs = {'farmer': 400, 'crafter': 180, 'guard': 0}
-        self.max_outputs = {'farmer': 180, 'crafter': 110, 'guard': 0}
+        # one farmer can feed himself + 1 other person
+        # so 1 farming family can feed another family
+        # 1 crafter can maintain 5 others
+        self.max_outputs = {'farmer': 260, 'crafter': 140, 'guard': 0}
 
         # profs
         self.prof_list = {
@@ -28,30 +31,33 @@ class Village:
                 'guard': [],
                 }
         #self.new_prof_rate = 0.10
+        self.prof_index = 0
 
         # GA controls
-        rate_total = sum(rates[:3])
-        self.farmer_rate = rates[0] / rate_total
-        self.crafter_rate = rates[1] / rate_total
-        self.guard_rate = rates[2] / rate_total
-        self.baby_rate = rates[3]
-        #self.baby_rate = 0.15
+        #rate_total = sum(rates[:3])
+        #self.farmer_rate = rates[0] / rate_total
+        #self.crafter_rate = rates[1] / rate_total
+        #self.guard_rate = rates[2] / rate_total
+        #self.baby_rate = rates[3]
+        self.baby_rate = 0.2
 
         # houses
         self.houses = []
         # create empty houses
         self.empty_houses = [House() for x in range(num_families*2)]
 
-        f = 'farmer'
-        c = 'crafter'
-        g = 'guard'
-        possible_profs = [c, f, g]
-        #if professions is None:  # standard spread, if we don't input
-        professions = []
-        for x in range(num_families):
-            professions.append(self.new_profession())
-        #professions = [f, f, f, f, c, c, c, c, g, g]
-        self.profession_init = professions
+        # professions None when GA is not active
+        if prof_designations is None:
+            f = 'farmer'
+            c = 'crafter'
+            g = 'guard'
+            possible_profs = [c, f, g]
+            self.prof_designations = []
+            for x in range(1200):
+                self.prof_designations.append(random.choice(possible_profs))
+        else:
+        	self.prof_designations = prof_designations
+
 
         for indx in range(num_families):
             # the profs assigned here don't matter
@@ -59,15 +65,15 @@ class Village:
             new_fam = Family(self, house, None)
             new_woman = Villager(self, new_fam, 'f')
             new_fam.add_kid(new_woman)
-            new_woman.force_grow_up()
-            new_woman.family.set_profession(professions[indx])
+            new_woman.force_grow_up()   # prof doesn't matter
+            new_woman.family.set_profession('farmer')
         for indx in range(num_families):
             house = self.empty_houses.pop()
             new_fam = Family(self, house, None)
             new_man = Villager(self, new_fam, 'm')
             new_fam.add_kid(new_man)
             new_man.force_grow_up()
-            new_man.family.set_profession(professions[indx])
+            new_man.family.set_profession(self.new_profession())
 
         # start with 1 kid each
         for family in self.families:
@@ -86,10 +92,9 @@ class Village:
                 if printing:
                     print "THE VILLAGE PEOPLE DIED IN YEAR {0}".format(year)
                     print "food: {0}, goods {1}".format(self.food, self.goods)
-                    print self.profession_init
                 return year, self.peak_villagers, self.peak_families
-            elif len(self.families) > 100:
-                return years, 1000, 100
+            #elif len(self.families) > 200:
+                #return years, 1000, 200
 
             if printing:
                 print "====== YEAR {0} ======".format(year)
@@ -137,8 +142,7 @@ class Village:
         self.empty_houses.append(family.house)
         try:
             self.families.remove(family)
-            prof = family.profession
-            self.prof_list[prof].remove(family)
+            self.prof_list[vgr.profession].remove(vgr)
         except:
             #print "####### FAMILY VALUE ERROR ##########"
             pass
@@ -171,44 +175,16 @@ class Village:
         	
 
     def new_profession(self):
-        """ roll for new profession and assign villager to it.
-        Profession rates are stored as percentage, where range of all 3 is 100.
-        e.g. farmer = 30, crafter = 60, guard = 99
-        villager does random roll, and is assigned based on range.
-        [0, 30] == farmer.
-        [31, 60] == crafter
-        [61, 99] == guard
         """
-        rate = random.random()
-        if rate <= self.farmer_rate:
-            return 'farmer'
-        elif rate <= self.farmer_rate + self.crafter_rate:
-            return 'crafter'
-        elif rate <= self.farmer_rate + self.crafter_rate + self.guard_rate:
-            return 'guard'
-        else:
-            raise Exception("ERROR: new profession")
-
-
-    def update_profession(self, new_prof_rate=0.1):
-        """ every year, adult villagers 
         """
-        #if random.random() < new_prof_rate:
-        rate = random.random()
-        if rate <= self.farmer_rate:
-            return 'farmer'
-        elif rate <= self.farmer_rate + self.crafter_rate:
-            return 'crafter'
-        elif rate <= self.farmer_rate + self.crafter_rate + self.guard_rate:
-            return 'guard'
-        #else:
-            #return None
+        prof = self.prof_designations[self.prof_index]
+        self.prof_index += 1
+        return prof
 
 
 if __name__ == "__main__":
-    rates = [0.59, 0.58, 0, 0.25]
     num_families = 10
-    vill = Village(rates, num_families)
-    fitness, count_villagers, count_families = vill.run_village(300)
+    vill = Village(num_families)
+    fitness, count_villagers, count_families = vill.run_village(1000, printing=False)
     print fitness, count_villagers, count_families
 
