@@ -14,7 +14,7 @@ class Lord_GA:
 
 
     def run(self, villages_per_gen=100, num_families=10, max_gens=10,
-            max_fitness=1000, elitism=False):
+            max_fitness=1000, elitism=False, use_ga=False):
         """
         GA repeatedly creates a village, runs it with values, then judges its
         performance and modifies values.
@@ -44,15 +44,25 @@ class Lord_GA:
 
             # now modify rates
             #elitism = True
-            P = self.tournament_select(P, results, elitism)
-            P = self.mutate(P, elitism)
-            #P = self.three_point_crossover(P)
-            P = self.alternate_crossover(P, elitism)
 
-            # BASE: replace P with random vals
-            #P = []
-            #for x in range(villages_per_gen):
-                #P.append(self.generate_genome())
+            if elitism:
+                fitnesses = [run[0] for run in results]
+                indexes = range(len(P))
+                max_fit_index = fitnesses.index(max(fitnesses))
+                P[0] = P[max_fit_index]
+                #P[1] = P[max_fit_index]
+
+            if use_ga:
+                P = self.tournament_select(P, results, elitism)
+                #P = self.mutate(P, elitism)
+                #P = self.alternate_crossover(P, elitism)
+                P = self.three_point_crossover(P)
+
+            else:
+                # BASE: replace P with random vals
+                P = []
+                for x in range(villages_per_gen):
+                    P.append(self.generate_genome())
 
             gen += 1
 
@@ -87,8 +97,7 @@ class Lord_GA:
         indexes = range(len(P))
 
         if elitism:
-            max_fit_index = fitnesses.index(max(fitnesses))
-            new_P = [P[max_fit_index], P[max_fit_index]]
+            new_P = [P[0], P[1]]
             iterations = len(P)-2
         else:
             new_P = []
@@ -198,6 +207,10 @@ class Lord_GA:
         """
         evolves P by randomly grabbing pairs of rows and crossing them
         """
+        if elitism:
+            elite_row1 = P[0][:]
+            elite_row2 = P[1][:]
+
         # first create list of indexes that we'll use to grab rows
         indexes = range(len(P))
         random.shuffle(indexes)
@@ -217,6 +230,9 @@ class Lord_GA:
             new_P.append(new_row_a)
             new_P.append(new_row_b)
 
+        if elitism:
+        	new_P[0] = elite_row1
+        	new_P[1] = elite_row2
         return new_P
 
 
@@ -229,22 +245,16 @@ if __name__ == "__main__":
     #### BASE RUNS ####
     villages_per_gen = 40
     num_families = 10
-    max_gens = 100
+    max_gens = 20
     max_fitness = 400
     elitism = True
-
-    # long analysis
-    #villages_per_gen = 100
-    #num_families = 10
-    #max_gens = 200
-    #max_fitness = 1000
-    #elitism = True
+    use_ga = True
 
     ga = Lord_GA(villages_per_gen)
 
     total_results = ga.run(
             villages_per_gen, num_families, max_gens,
-            max_fitness, elitism)
+            max_fitness, elitism, use_ga)
 
     timestr = time.strftime("%Y%m%d-%H%M%S")
     result_dir = os.path.join(os.path.dirname(os.path.os.path.realpath(__file__)), 'results')
@@ -262,10 +272,6 @@ if __name__ == "__main__":
             for row in results:
                 outs.writerow(row)
             fitnesses = [row[0] for row in results]
-            #f_rates = [row[1] for row in results]
-            #c_rates = [row[2] for row in results]
-            #g_rates = [row[3] for row in results]
-            #b_rates = [row[4] for row in results]
             max_fit = max(fitnesses)
             avg_fit = round(sum(filter(None, fitnesses)) * 1.0 / len(fitnesses))
 
