@@ -93,12 +93,6 @@ class Family:
             kid.birthday()
         if len(self.kids) < 8:
             self.check_for_baby(self.village.baby_rate)
-        # check if we need to change professions
-        #if random.random() < self.new_prof_rate:
-            #prof = self.profession
-            #self.village.prof_list[prof].remove(self)
-            #self.profession = self.village.update_profession()
-            #self.village.prof_list[self.profession].append(self)
 
 
     def monthly_update(self, show_status=False):

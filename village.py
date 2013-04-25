@@ -60,14 +60,14 @@ class Village:
             new_woman = Villager(self, new_fam, 'f')
             new_fam.add_kid(new_woman)
             new_woman.force_grow_up()   # prof doesn't matter
-            new_woman.family.set_profession('farmer')
+            #new_woman.family.set_profession('farmer')
         for indx in range(num_families):
             house = self.empty_houses.pop()
             new_fam = Family(self, house, None)
             new_man = Villager(self, new_fam, 'm')
             new_fam.add_kid(new_man)
             new_man.force_grow_up()
-            new_man.family.set_profession(self.new_profession())
+            #new_man.family.set_profession(self.new_profession())
 
         # start with 1 kid each
         for family in self.families:
@@ -119,16 +119,25 @@ class Village:
                 family.yearly_update()
 
             # check for invasion!
-            invasion_chance = random.random()
-            if invasion_chance <= 0.1:
-                self.invasion()
-                print "INVASION!"
+            num_families = len(self.families)
+            if num_families:
+                if 0 <= num_families < 25:
+                    threat = 0.2
+                elif 25 <= num_families < 50:
+                    threat = 0.33
+                elif 50 <= num_families < 100:
+                    threat = 0.5
+                else:
+                    damage = 0.5
+                invasion_chance = random.random()
+                if invasion_chance <= threat:
+                    self.invasion()
 
 
-            # SPOILAGE
-            # every other year, 10% of food spoils
-            #if year % 2 == 0:
-                #self.food = round( self.food * 0.9)
+            # FAMINE
+            famine_chance = random.random()
+            if famine_chance <= 0.2:
+                self.food = self.food * 0.5
 
         # YOU MADE IT!!!!!
         return year, self.peak_villagers, self.peak_families
@@ -140,21 +149,27 @@ class Village:
         current village. Prosperous cities attract formidable foes.
         Larger invasions necessitate more guards for a successful defense.
         """
+
+        # modify based on # guards
         num_families = len(self.families)
-        if 0 <= num_families < 50:
-            damage = 0.1
-        elif 50 <= num_families < 100:
-            damage = 0.2
-        elif 100 <= num_families < 200:
-            damage = 0.3
-        else:
-            damage = 0.4
+        num_guard_families = float(len(self.prof_list['guard']))
+        fraction_guards = num_guard_families / num_families
+        damage = 0.9
+        if 0 < fraction_guards < 0.1:
+            damage *= 0.75
+        elif 0.1 <= fraction_guards < 0.2:
+            damage *= 0.5
+        elif 0.2 <= fraction_guards < 0.3:
+            damage *= 0.25
+        elif 0.3 <= fraction_guards <= 1.0:
+            damage *= 0
+            return True
 
         # calculate invasion damage
-        self.food *= damage
-        self.goods *= damage
+        self.food = self.food * (1 - damage)
+        self.goods = self.goods * (1 - damage)
 
-        num_villagers_killed = len(self.villagers) * damage
+        num_villagers_killed = int(len(self.villagers) * damage)
         villagers_killed = random.sample(self.villagers, num_villagers_killed)
         for villager in villagers_killed:
             villager.hp = 0
@@ -172,7 +187,7 @@ class Village:
         self.empty_houses.append(family.house)
         try:
             self.families.remove(family)
-            self.prof_list[vgr.profession].remove(vgr)
+            self.prof_list[family.profession].remove(family)
         except:
             #print "####### FAMILY VALUE ERROR ##########"
             pass

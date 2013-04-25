@@ -244,8 +244,8 @@ if __name__ == "__main__":
     num_families = 10
     max_gens = 100
     max_fitness = 500
-    use_ga = True
-    elitism = True
+    use_ga = False
+    elitism = False
 
     ga = Lord_GA(villages_per_gen)
 
