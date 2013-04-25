@@ -51,7 +51,7 @@ class Lord_GA:
 
             if use_ga:
                 P = self.tournament_select(P, results, elitism)
-                #P = self.mutate(P, elitism)
+                P = self.mutate(P, elitism)
                 P = self.alternate_crossover(P, elitism)
                 #P = self.three_point_crossover(P)
 
@@ -80,7 +80,7 @@ class Lord_GA:
         c = 'crafter'
         g = 'guard'
         prof_designations = []
-        for x in range(20000):
+        for x in range(4000):
             prof_designations.append(random.choice([c, f, g]))
         return prof_designations
 
@@ -242,8 +242,8 @@ if __name__ == "__main__":
     #### BASE RUNS ####
     villages_per_gen = 40
     num_families = 10
-    max_gens = 20
-    max_fitness = 400
+    max_gens = 100
+    max_fitness = 500
     use_ga = True
     elitism = True
 

@@ -17,12 +17,12 @@ class Village:
         self.villagers = []
         self.prospects = []  # list available mates
         self.families = []
-        # avg years: 200
         # one farmer can feed himself + 1 other person
-        # so 1 farming family can feed another family
-        # 1 crafter can maintain 5 others
-        #self.max_outputs = {'farmer': 260, 'crafter': 140, 'guard': 0}
-        self.max_outputs = {'farmer': 300, 'crafter': 180, 'guard': 0}
+        # so 1 farming family (avg 4 people) generates 240 food
+        # 1 crafter can maintain 4 others
+        # 1 craft family generates 160
+        #self.max_outputs = {'farmer': 260, 'crafter': 150, 'guard': 0}
+        self.max_outputs = {'farmer': 240, 'crafter': 160, 'guard': 0}
 
         # profs
         self.prof_list = {
@@ -118,9 +118,10 @@ class Village:
             for family in self.families:
                 family.yearly_update()
 
+            # SPOILAGE
             # every other year, 10% of food spoils
-            if year % 2 == 0:
-                self.food = round( self.food * 0.9)
+            #if year % 2 == 0:
+                #self.food = round( self.food * 0.9)
 
         # YOU MADE IT!!!!!
         return year, self.peak_villagers, self.peak_families
@@ -171,6 +172,9 @@ class Village:
     def new_profession(self):
         """
         """
+        if self.prof_index == len(self.prof_designations):
+        	print "PROF REFRESH"
+        	self.prof_index = 0
         prof = self.prof_designations[self.prof_index]
         self.prof_index += 1
         return prof

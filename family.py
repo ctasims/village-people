@@ -91,7 +91,7 @@ class Family:
             self.mom.birthday()
         for kid in self.kids:
             kid.birthday()
-        if len(self.kids) < 10:
+        if len(self.kids) < 8:
             self.check_for_baby(self.village.baby_rate)
         # check if we need to change professions
         #if random.random() < self.new_prof_rate:
@@ -259,7 +259,7 @@ class Family:
         Called by ???
         """
         if random.random() < chance:
-            if self.mom:
+            if self.mom and self.mom.age <= 60:
                 baby = self.mom.give_birth()
                 self.kids.append(baby)
                 self.update_stats()

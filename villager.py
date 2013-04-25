@@ -10,7 +10,7 @@ class Villager:
     Their main stat is hp.
     """
     age_labels = ['infant', 'child', 'prime', 'middle', 'old']
-    adulthood = 15
+    adulthood = 18
     age_groups = [[0, 5], [6, adulthood-1], [adulthood, 40], [41, 60], [61, 200]]
     age_hp = [5, 10, 50, -50, -100]
     req_food = 30
