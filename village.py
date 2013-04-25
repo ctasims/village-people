@@ -118,6 +118,13 @@ class Village:
             for family in self.families:
                 family.yearly_update()
 
+            # check for invasion!
+            invasion_chance = random.random()
+            if invasion_chance <= 0.1:
+                self.invasion()
+                print "INVASION!"
+
+
             # SPOILAGE
             # every other year, 10% of food spoils
             #if year % 2 == 0:
@@ -125,6 +132,34 @@ class Village:
 
         # YOU MADE IT!!!!!
         return year, self.peak_villagers, self.peak_families
+
+
+    def invasion(self):
+        """ 
+        The potential damage from an invasion depends on the size of the
+        current village. Prosperous cities attract formidable foes.
+        Larger invasions necessitate more guards for a successful defense.
+        """
+        num_families = len(self.families)
+        if 0 <= num_families < 50:
+            damage = 0.1
+        elif 50 <= num_families < 100:
+            damage = 0.2
+        elif 100 <= num_families < 200:
+            damage = 0.3
+        else:
+            damage = 0.4
+
+        # calculate invasion damage
+        self.food *= damage
+        self.goods *= damage
+
+        num_villagers_killed = len(self.villagers) * damage
+        villagers_killed = random.sample(self.villagers, num_villagers_killed)
+        for villager in villagers_killed:
+            villager.hp = 0
+            villager.die()
+        return True
 
 
     def remove_family(self, family):

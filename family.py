@@ -148,20 +148,6 @@ class Family:
 
         for dead in losses:
             dead.die()
-        # Also handle deaths
-        #if self.dad:
-            #dad_status = self.dad.monthly_update()
-        #if self.mom:
-            #mom_status = self.mom.monthly_update()
-
-        #losses = []
-        #for kid in self.kids:
-            #status = kid.monthly_update()
-            #if not status:
-            	# kid died!
-                #losses.append(kid)
-        #for kid in losses:
-            #self.remove_kid(kid)
 
         # update family output
         if self.profession == 'farmer':

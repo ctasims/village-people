@@ -72,26 +72,6 @@ class Villager:
         return self.id == other.id
 
 
-    #def monthly_update(self):
-        #"""
-        #every month villagers get food and update their hp.
-        #Without food, family will last 2-3 months before dying.
-        #"""
-        #if self.family.nourishment is "good":
-            #mod =  self.age_hp[self.age_group]
-        #else:
-            #mod = -300
-        #self.hp += mod
-        #self.hp = 1000 if self.hp > 1000 else self.hp
-
-        ## villager dies!
-        #if self.hp < 0:
-            #self.die()
-            #return False
-        #else:
-            #return True
-
-
     def birthday(self):
         """
         Every year, advance villager's age and refresh stats
