@@ -5,7 +5,7 @@ from family import Family
 import sys
 
 
-class Village:
+class Village(object):
 
     def __init__(self, num_families, prof_designations=None):
         self.goods = 1000
@@ -19,8 +19,6 @@ class Village:
         self.families = []
         # one farmer can feed himself + 1 other person
         # so 1 farming family (avg 4 people) generates 240 food
-        # 1 crafter can maintain 4 others
-        # 1 craft family generates 160
         #self.max_outputs = {'farmer': 260, 'crafter': 150, 'guard': 0}
         self.max_outputs = {'farmer': 240, 'crafter': 160, 'guard': 0}
 
@@ -76,17 +74,23 @@ class Village:
 
 
 
-    def run_village(self, years, printing=True):
+    def run_village(self, years, printing=True, catastrophe=False, presentation=False):
         for year in range(years):
             self.year = year
             #import pdb
             #if year == 150:
                 #pdb.set_trace()
+            if year == 300:
+                return years
+            if year == 300 or year == 400 or year == 500:
+                print 'YEAR: %s' % year
+            if presentation and year == 300:
+                return years
             if self.families == []:
                 if printing:
                     print "THE VILLAGE PEOPLE DIED IN YEAR {0}".format(year)
                     print "food: {0}, goods {1}".format(self.food, self.goods)
-                return year, self.peak_villagers, self.peak_families
+                return year
             #elif len(self.families) > 200:
                 #return years, 1000, 200
 
@@ -107,69 +111,61 @@ class Village:
                     print '\n'
                     print "VILLAGE: {0}/{1}\n".format(self.food, self.goods)
                 # update counts
-            curr_villagers = len(self.villagers)
-            if curr_villagers > self.peak_villagers:
-                self.peak_villagers = curr_villagers
-            curr_families = len(self.families)
-            if curr_families > self.peak_families:
-                self.peak_families = curr_families
 
             # annual update for each family
             for family in self.families:
                 family.yearly_update()
 
-            # check for invasion!
-            num_families = len(self.families)
-            if num_families:
-                if 0 <= num_families < 25:
-                    threat = 0.2
-                elif 25 <= num_families < 50:
-                    threat = 0.33
-                elif 50 <= num_families < 100:
-                    threat = 0.5
-                else:
-                    damage = 0.5
-                invasion_chance = random.random()
-                if invasion_chance <= threat:
+
+            ########## INVASION #############
+            # first check to see if invasion occurs. Static chance.
+            # determine strength of invasion. This is also random.
+            # number of guard families will modify the resulting attack.
+
+            if catastrophe:
+                invasion_chance = 0.2  # once every 5 years
+                invaded = random.random()
+                if invaded <= invasion_chance:
                     self.invasion()
 
-
-            # FAMINE
-            famine_chance = random.random()
-            if famine_chance <= 0.2:
-                self.food = self.food * 0.5
+                # FAMINE
+                #famine_chance = random.random()
+                #if famine_chance <= 0.1:
+                    #self.food = self.food * 0.5
 
         # YOU MADE IT!!!!!
-        return year, self.peak_villagers, self.peak_families
+        return year
 
 
     def invasion(self):
         """ 
-        The potential damage from an invasion depends on the size of the
-        current village. Prosperous cities attract formidable foes.
-        Larger invasions necessitate more guards for a successful defense.
+        Determine strength of invasion. This is random.
+        Invasion damage can be reduced by guards.
         """
+
+        invasion_damage = random.random()
 
         # modify based on # guards
         num_families = len(self.families)
+        if num_families == 0:
+            return False
         num_guard_families = float(len(self.prof_list['guard']))
         fraction_guards = num_guard_families / num_families
-        damage = 0.9
         if 0 < fraction_guards < 0.1:
-            damage *= 0.75
+            invasion_damage *= 0.75
         elif 0.1 <= fraction_guards < 0.2:
-            damage *= 0.5
+            invasion_damage *= 0.5
         elif 0.2 <= fraction_guards < 0.3:
-            damage *= 0.25
+            invasion_damage *= 0.25
         elif 0.3 <= fraction_guards <= 1.0:
-            damage *= 0
+            invasion_damage = 0
             return True
 
         # calculate invasion damage
-        self.food = self.food * (1 - damage)
-        self.goods = self.goods * (1 - damage)
+        self.food = self.food * (1 - invasion_damage)
+        self.goods = self.goods * (1 - invasion_damage)
 
-        num_villagers_killed = int(len(self.villagers) * damage)
+        num_villagers_killed = int(len(self.villagers) * invasion_damage)
         villagers_killed = random.sample(self.villagers, num_villagers_killed)
         for villager in villagers_killed:
             villager.hp = 0
@@ -223,7 +219,7 @@ class Village:
         """
         """
         if self.prof_index == len(self.prof_designations):
-        	print "PROF REFRESH"
+            #print "r"
         	self.prof_index = 0
         prof = self.prof_designations[self.prof_index]
         self.prof_index += 1

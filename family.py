@@ -149,7 +149,8 @@ class Family:
         elif self.profession == 'crafter':
             self.village.goods += self.output
         elif self.profession == 'guard':
-            pass
+            self.village.food -= self.req_food
+            self.village.goods -= self.req_goods
 
         if show_status:
             self.print_status()
@@ -167,7 +168,7 @@ class Family:
         # update family size and member info
         self.members = []
         if self.dad:
-        	self.members = [self.dad]
+        	self.members += [self.dad]
         if self.mom:
         	self.members += [self.mom]
         if self.kids:
